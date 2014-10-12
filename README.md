@@ -1,7 +1,7 @@
 # Convergence
 
 Convergence is a Database Schema management tools.
-This tools is support only MySQL.
+Currently, This tools is support only MySQL.
 
 ## Installation
 
