@@ -203,6 +203,61 @@ $ convergence -c database.yml -i example.schema --apply
 
 ## Detail About Convergence DSL
 
+### support column types
+
+Convergence is currently support column types below.
+
+- tinyint
+- smallint
+- mediumint
+- int
+- bigint
+- float
+- double
+- decimal
+- char
+- varchar
+- tinyblob
+- blob
+- mediumblob
+- tinytext
+- text
+- mediumtext
+- longtext
+- date
+- time
+- datetime
+- timestamp
+- year
+
+```
+create_table "tests", comment: 'Column type example' do |t|
+  t.int 'id', primary_key: true, extra: 'auto_increment'
+  t.float 'float_col', comment: 'Float column'
+  t.decimal 'decimal_col', default: "0.000", precision: 12, scale: 3
+  t.varchar 'test_string', null: true, default: 'hello', limit: 300
+  t.text 'text_col'
+  t.datetime 'created_at'
+end
+```
+
+### index
+
+```
+create_table "tests", comment: 'Index example' do |t|
+  t.int 'id', primary_key: true, extra: 'auto_increment'
+  t.varchar 'column1'
+  t.varchar 'column2'
+
+  t.index 'column1'
+  t.index ['column2', 'column1']
+  t.index 'column2', name: 'column2_idx'
+end
+```
+
+### foreign key
+
+### table options
 
 ## Test
 
