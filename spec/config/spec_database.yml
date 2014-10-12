@@ -1,0 +1,6 @@
+mysql:
+  adapter: mysql
+  database: convergence_test_db
+  host: localhost
+  port: 3389
+  username: root

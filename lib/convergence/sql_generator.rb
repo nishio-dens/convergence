@@ -1,0 +1,2 @@
+class SQLGenerator
+end

@@ -1,0 +1,24 @@
+create_table "authors", collate: "utf8_general_ci", comment: "" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "name", limit: 110
+  t.datetime "created_at", null: true, comment: 'Created At'
+  t.datetime "updated_at", null: true
+
+  t.index "created_at", name: "index_authors_on_created_at"
+end
+
+create_table "papers", collate: "utf8_general_ci", comment: "Paper" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "title1", limit: 300, comment: "Title 1"
+  t.varchar "title2", limit: 300, comment: "Title 2"
+  t.text "description", null: true, comment: "Description"
+end
+
+create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author Relation" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.int "paper_id", comment: "Paper id"
+  t.int "author_id", comment: "Paper author id"
+
+  t.foreign_key "author_id", reference: "authors", reference_column: "id", name: "paper_authors_author_id_fk"
+  t.foreign_key "paper_id", reference: "papers", reference_column: "id", name: "paper_authors_paper_id_fk"
+end

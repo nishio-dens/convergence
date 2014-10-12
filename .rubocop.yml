@@ -1,0 +1,32 @@
+LineLength:
+  Enabled: false
+
+MethodLength:
+  Enabled: false
+
+IfUnlessModifier:
+  Enabled: false
+
+AsciiComments:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+ClassLength:
+  Max: 200
+
+RaiseArgs:
+  Enabled: false
+
+RescueModifier:
+  Enabled: false
+
+CyclomaticComplexity:
+  Max: 30
+
+Output:
+  Enabled: false
+
+ClassAndModuleChildren:
+  Enabled: false
