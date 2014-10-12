@@ -25,3 +25,16 @@ Or install it yourself as:
 gem install convergence
 ```
 
+## Usage
+
+```
+Usage: convergence [options]
+    -v, --version
+    -c, --config       Database Yaml Setting
+    -d, --diff         DSL1,DSL2
+    -e, --export       export db schema to dsl
+    -i, --input        Input DSL
+        --dryrun
+        --apply        execute sql to your database
+    -h, --help         Display this help message.
+```
