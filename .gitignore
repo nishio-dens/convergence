@@ -1,3 +1,4 @@
 tmp/
 tags
 database.yml
+pkg/
