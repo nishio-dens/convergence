@@ -157,7 +157,7 @@ First, you need to create database.yml.
 And then, execute command like below.
 
 ```
-$ convergence -c database.yml --export
+$ convergence -c database.yml --export > example.schema
 ```
 
 Export DSL like this.
@@ -189,4 +189,28 @@ create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author
 end
 ```
 
+### Dryrun
+
+```
+$ convergence -c database.yml -i example.schema --dryrun
+```
+
+### Apply
+
+```
+$ convergence -c database.yml -i example.schema --apply
+```
+
 ## Detail About Convergence DSL
+
+
+## Test
+
+```
+$ bundle exec rake db:convergence:prepare
+$ bundle exec rspec
+```
+
+## Copyright
+
+Copyright © 2014 S.nishio. See LICENSE.txt for further details.
