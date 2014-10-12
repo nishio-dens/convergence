@@ -257,7 +257,37 @@ end
 
 ### foreign key
 
+```
+create_table "authors" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "name", limit: 110
+end
+
+create_table "papers", collate: "utf8_general_ci", comment: "Paper" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "title1"
+end
+
+create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author Relation" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.int "paper_id", comment: "Paper id"
+  t.int "author_id", comment: "Paper author id"
+
+  t.foreign_key "author_id", reference: "authors", reference_column: "id"
+  t.foreign_key "paper_id", reference: "papers", reference_column: "id", name: "paper_authors_paper_id_fk"
+end
+
+```
+
 ### table options
+
+```
+create_table "authors", comment: 'Author', engine: 'MyISAM', collate: "utf8_general_ci", default_charset: 'utf8' do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "name", limit: 110
+end
+```
+
 
 ## Test
 
