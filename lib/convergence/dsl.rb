@@ -6,7 +6,7 @@ class Convergence::DSL
   end
 
   def create_table(table_name, options = {}, &block)
-    table = Convergence::Table.new(table_name, options)
+    table = Convergence::Table.new(table_name.to_s, options)
     block.call(table)
     @tables[table_name.to_s] = table
     table
