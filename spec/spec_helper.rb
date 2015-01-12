@@ -12,6 +12,21 @@ def mysql_settings
   Convergence::Config.new(Hash[mysql_settings.map { |k, v| [k.to_sym, v] }])
 end
 
+def rollback
+  # FIXME But I have no idea to rollback create/drop/alter table of mysql
+  sqls = File.open("#{File.dirname(__FILE__)}/fixtures/test_db.sql")
+    .read
+    .split(';')
+    .map(&:strip)
+    .reject(&:empty?)
+  sqls.each do |sql|
+    Convergence::Command.new({}, config: mysql_settings)
+      .connector
+      .client
+      .query("#{sql};")
+  end
+end
+
 RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true

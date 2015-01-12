@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS `paper_authors`;
+DROP TABLE IF EXISTS `papers`;
+DROP TABLE IF EXISTS `authors`;
+
 CREATE TABLE `papers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title1` varchar(300) NOT NULL COMMENT 'Title 1',
