@@ -20,4 +20,12 @@ describe 'Changeable Foreign key' do
       expect { execute(exec_dsl) }.not_to raise_error
     end
   end
+
+  describe 'change foreign key' do
+    let(:exec_dsl) { 'change_foreign_key.schema' }
+
+    it 'should be drop foreign key' do
+      expect { execute(exec_dsl) }.not_to raise_error
+    end
+  end
 end
