@@ -24,6 +24,12 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     change_table = delta[:change_table]
     results = []
     change_table.each do |table_name, table_delta|
+      table_delta[:remove_foreign_key].each do |index_name, _foreign_key|
+        results << alter_remove_foreign_key_sql(table_name, index_name)
+      end
+      table_delta[:remove_index].each do |index_name, _index|
+        results << alter_remove_index_sql(table_name, index_name)
+      end
       table_delta[:remove_column].each do |_column_name, column|
         results << alter_remove_column_sql(table_name, column)
       end
@@ -33,14 +39,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
       table_delta[:change_column].each do |column_name, column|
         results << alter_change_column_sql(table_name, column_name, column, to_table)
       end
-      table_delta[:remove_index].each do |index_name, _index|
-        results << alter_remove_index_sql(table_name, index_name)
-      end
       table_delta[:add_index].each do |_index_name, index|
         results << alter_add_index_sql(table_name, index)
-      end
-      table_delta[:remove_foreign_key].each do |index_name, _foreign_key|
-        results << alter_remove_foreign_key_sql(table_name, index_name)
       end
       table_delta[:add_foreign_key].each do |_index_name, foreign_key|
         results << alter_add_foreign_key_sql(table_name, foreign_key)
