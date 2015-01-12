@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'Changeable Foreign key' do
   after(:each) do
     rollback

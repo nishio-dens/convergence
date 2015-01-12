@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'Command::Dryrun#execute' do
   def execute(dsl_path)
     parse_option = {
