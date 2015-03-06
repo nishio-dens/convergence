@@ -201,6 +201,14 @@ $ convergence -c database.yml -i example.schema --dryrun
 $ convergence -c database.yml -i example.schema --apply
 ```
 
+### Include Other Schema files
+
+```
+include 'first_schema.schema'
+include 'other_file.schema'
+```
+
+
 ## Detail About Convergence DSL
 
 ### support column types
