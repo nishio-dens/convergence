@@ -1,5 +1,5 @@
 class Convergence::DSL
-  attr_accessor :tables
+  attr_accessor :tables, :current_dir_path
 
   def initialize
     @tables = {}
@@ -12,8 +12,13 @@ class Convergence::DSL
     table
   end
 
-  def self.parse(code)
+  def include(path)
+    @tables.merge!(Convergence::DSL.parse(File.open("#{current_dir_path}/#{path}").read, current_dir_path))
+  end
+
+  def self.parse(code, current_dir_path)
     parser = new
+    parser.current_dir_path = current_dir_path
     parser.instance_eval(code)
     parser.tables
   end

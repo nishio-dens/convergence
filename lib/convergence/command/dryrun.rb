@@ -1,3 +1,4 @@
+require 'pathname'
 class Convergence::Command::Dryrun < Convergence::Command
   def validate!
     fail ArgumentError.new('--config required') if @config.nil?
@@ -6,7 +7,8 @@ class Convergence::Command::Dryrun < Convergence::Command
 
   def execute
     validate!
-    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read)
+    current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
+    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
     current_tables = dumper.dump
     # -- maybe it's redundant output
     # output_diff(input_tables, current_tables)

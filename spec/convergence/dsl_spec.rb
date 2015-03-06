@@ -33,7 +33,7 @@ describe Convergence::DSL do
 
   describe '#parse' do
     context 'when exist only one table' do
-      subject { Convergence::DSL.parse(dsl_single_table) }
+      subject { Convergence::DSL.parse(dsl_single_table, '') }
 
       it 'should be able to parse tables' do
         expect(subject['users']).not_to be_nil
@@ -67,7 +67,7 @@ describe Convergence::DSL do
     end
 
     context 'when multiple tables exists' do
-      subject { Convergence::DSL.parse(dsl_multi_table) }
+      subject { Convergence::DSL.parse(dsl_multi_table, '') }
 
       it 'should be able to parse tables' do
         expect(subject['users']).not_to be_nil

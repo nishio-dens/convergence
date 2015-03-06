@@ -1,4 +1,5 @@
 require 'benchmark'
+require 'pathname'
 
 class Convergence::Command::Apply < Convergence::Command
   def validate!
@@ -8,7 +9,8 @@ class Convergence::Command::Apply < Convergence::Command
 
   def execute
     validate!
-    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read)
+    current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
+    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
     current_tables = dumper.dump
     execute_sql(input_tables, current_tables)
   end
