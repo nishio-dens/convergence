@@ -13,7 +13,8 @@ class Convergence::DSL
   end
 
   def include(path)
-    @tables.merge!(Convergence::DSL.parse(File.open("#{current_dir_path}/#{path}").read, current_dir_path))
+    next_dir_path = File.dirname("#{@current_dir_path}/#{path}")
+    @tables.merge!(Convergence::DSL.parse(File.open("#{current_dir_path}/#{path}").read, next_dir_path))
   end
 
   def self.parse(code, current_dir_path)
