@@ -1,7 +1,7 @@
 class Convergence::DefaultParameter
   def initialize(adapter)
     case adapter.downcase
-    when 'mysql'
+    when 'mysql', 'mysql2'
       @parameter_klass = Convergence::DefaultParameter::MysqlDefaultParameter.new
     else
       fail NotImplementedError.new("unknown adapter #{config.adapter}.")

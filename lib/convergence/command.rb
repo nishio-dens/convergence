@@ -34,7 +34,7 @@ class Convergence::Command
 
   def dumper
     @dumper ||= case database_adapter
-                when 'mysql'
+                when 'mysql', 'mysql2'
                   Convergence::Dumper::MysqlSchemaDumper.new(connector)
                 else
                   fail NotImplementedError.new('unknown database adapter')
@@ -43,7 +43,7 @@ class Convergence::Command
 
   def sql_generator
     @sql_generator ||= case database_adapter
-                       when 'mysql'
+                       when 'mysql', 'mysql2'
                          SQLGenerator::MysqlGenerator.new
                        else
                          fail NotImplementedError.new('unknown database adapter')

@@ -1,5 +1,5 @@
 mysql:
-  adapter: mysql
+  adapter: mysql2
   database: convergence_test_db
   host: localhost
   port: 3389
