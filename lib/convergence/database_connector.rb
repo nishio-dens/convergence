@@ -4,7 +4,7 @@ class Convergence::DatabaseConnector
   def initialize(config)
     @connector =
       case config.adapter
-      when 'mysql'
+      when 'mysql', 'mysql2'
         Convergence::DatabaseConnector::MysqlConnector.new(config)
       else
         fail NotImplementedError.new("#{config.adapter} not supported yet")
