@@ -119,6 +119,7 @@ class Convergence::Dumper::MysqlSchemaDumper
   end
 
   def parse_indexes(table, table_indexes)
+    return if table_indexes.nil?
     table_indexes.group_by { |r| r['INDEX_NAME'] }.each do |index_name, indexes|
       type = indexes.first['CONSTRAINT_TYPE']
       columns = indexes.map { |v| v['COLUMN_NAME'] }

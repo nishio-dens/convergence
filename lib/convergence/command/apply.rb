@@ -48,6 +48,6 @@ SET FOREIGN_KEY_CHECKS=1;
     input_tables_with_full_option =
       Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
     delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
-    sql_generator.generate(input_tables_with_full_option, delta)
+    sql_generator.generate(input_tables_with_full_option, delta, current_tables_with_full_option)
   end
 end

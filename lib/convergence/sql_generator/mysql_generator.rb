@@ -8,7 +8,10 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
   }
   QUOTE_OPTION = [:comment]
 
-  def generate(to_table, delta)
+  attr_reader :original_table
+
+  def generate(to_table, delta, original_table)
+    @original_table = original_table
     sqls = []
     sqls << change_table_sql(to_table, delta)
     sqls << ['']
@@ -63,7 +66,17 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
   def alter_change_column_sql(table_name, column_name, change_column_option, to_table)
     column = to_table[table_name].columns[column_name]
     column.options.merge!(after: change_column_option[:after]) unless change_column_option[:after].nil?
-    %(ALTER TABLE `#{table_name}` MODIFY COLUMN #{create_column_sql(column, output_primary_key: true)};)
+    sql = ""
+    original_column = original_table[table_name].columns[column_name]
+    if original_column.options[:primary_key]
+      extra = original_column.options[:extra]
+      if extra && extra.upcase.include?('AUTO_INCREMENT')
+        sql += %(ALTER TABLE `#{table_name}` MODIFY COLUMN #{create_column_sql(original_column, output_auto_increment: false)};\n)
+      end
+      sql += %(ALTER TABLE `#{table_name}` DROP PRIMARY KEY;\n)
+    end
+    sql += %(ALTER TABLE `#{table_name}` MODIFY COLUMN #{create_column_sql(column, output_primary_key: true)};)
+    sql
   end
 
   def alter_change_table_sql(table_name, change_table_option)
@@ -131,7 +144,7 @@ DROP TABLE `#{table_name}`;
     end
   end
 
-  def create_column_sql(column, output_primary_key: false)
+  def create_column_sql(column, output_primary_key: false, output_auto_increment: true)
     sql = "`#{column.column_name}`"
     sql += " #{column.type}"
     sql += "(#{column.options[:limit]})" unless column.options[:limit].nil?
@@ -159,7 +172,11 @@ DROP TABLE `#{table_name}`;
       sql += " COMMENT '#{column.options[:comment]}'"
     end
     if column.options[:extra]
-      sql += " #{column.options[:extra].upcase}"
+      if output_auto_increment
+        sql += " #{column.options[:extra].upcase}"
+      else
+        sql += " #{column.options[:extra].upcase.sub('AUTO_INCREMENT', '')}"
+      end
     end
     if column.options.keys.include?(:after)
       if column.options[:after].nil?
