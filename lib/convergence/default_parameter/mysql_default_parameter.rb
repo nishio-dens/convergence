@@ -135,9 +135,10 @@ class Convergence::DefaultParameter::MysqlDefaultParameter
         .merge(column.options)
       if TEXT_TYPE.include?(type)
         character_set = table.table_options[:default_charset] || DEFAULT_TABLE_PARAMETERS[:default_charset]
-        parameters = parameters.merge(
+        parameters = {
           character_set: character_set,
-          collate: table.table_options[:collate] || DEFAULT_COLLATE_NAME[character_set.downcase])
+          collate: table.table_options[:collate] || DEFAULT_COLLATE_NAME[character_set.downcase]
+        }.merge(parameters)
       end
       column.options = parameters
     end
