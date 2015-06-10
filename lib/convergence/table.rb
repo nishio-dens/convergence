@@ -7,6 +7,16 @@ class Convergence::Table
     end
   end
 
+  def boolean(column_name, options = {})
+    case options[:default]
+    when TrueClass
+      options[:default] = 1
+    when FalseClass
+      options[:default] = 0
+    end
+    tinyint(column_name, options.merge(limit: 1))
+  end
+
   def index(index_columns, options = {})
     index_name = options[:name]
     index_name = "index_#{table_name}_on_#{[index_columns].flatten.join('_')}" if index_name.nil?
