@@ -99,7 +99,7 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
   def alter_add_index_sql(table_name, index)
     sql = 'CREATE'
     sql += ' UNIQUE' if index.options[:unique]
-    sql += " INDEX `#{index.index_name}` ON `#{table_name}`(#{index.index_columns.join(',')});"
+    sql += " INDEX `#{index.index_name}` ON `#{table_name}`(#{index.quoted_columns.join(',')});"
     sql
   end
 
