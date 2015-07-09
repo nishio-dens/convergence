@@ -54,7 +54,7 @@ class Convergence::Dumper::MysqlSchemaDumper
   def select_index_definitions(database_name)
     mysql.query("
       SELECT
-        DISTINCT S.TABLE_NAME, S.COLUMN_NAME, S.NON_UNIQUE, S.INDEX_NAME, S.SEQ_IN_INDEX, S.INDEX_TYPE,
+        DISTINCT S.TABLE_NAME, S.COLUMN_NAME, S.SUB_PART, S.NON_UNIQUE, S.INDEX_NAME, S.SEQ_IN_INDEX, S.INDEX_TYPE,
         IF(TC.CONSTRAINT_TYPE IS NULL, 'INDEX', TC.CONSTRAINT_TYPE) CONSTRAINT_TYPE,
         KCU.REFERENCED_TABLE_NAME, KCU.REFERENCED_COLUMN_NAME
       FROM
@@ -132,6 +132,8 @@ class Convergence::Dumper::MysqlSchemaDumper
       when 'INDEX', 'UNIQUE'
         options = { name: index_name, type: indexes.first['INDEX_TYPE'] }
         options.merge!(unique: true) if type == 'UNIQUE'
+        length = indexes.reject { |v| v['SUB_PART'].nil? }.reduce({}) { |a, e| a[e['COLUMN_NAME']] = e['SUB_PART']; a }
+        options.merge!(length: length) unless length.empty?
         table.index(columns, options)
       when 'FOREIGN KEY'
         to_table = indexes.first['REFERENCED_TABLE_NAME']
