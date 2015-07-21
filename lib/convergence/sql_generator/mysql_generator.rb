@@ -198,10 +198,10 @@ DROP TABLE `#{table_name}`;
       results << %(PRIMARY KEY (#{pkeys.keys.map { |v| "`#{v}`" }.join(',')}))
     end
     results << unique_keys.map do |uk|
-      %(UNIQUE KEY `#{uk.index_name}` (#{uk.index_columns.map { |v| "`#{v}`" }.join(',')}))
+      %(UNIQUE KEY `#{uk.index_name}` (#{uk.quoted_columns.join(',')}))
     end
     results << index_keys.map do |ik|
-      %(KEY `#{ik.index_name}` (#{ik.index_columns.map { |v| "`#{v}`" }.join(',')}))
+      %(KEY `#{ik.index_name}` (#{ik.quoted_columns.join(',')}))
     end
     results << foreign_keys.map do |fk|
       sql = %(CONSTRAINT `#{fk.key_name}` FOREIGN KEY)
