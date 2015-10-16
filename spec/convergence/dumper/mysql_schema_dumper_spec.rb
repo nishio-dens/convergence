@@ -67,10 +67,17 @@ describe Convergence::Dumper::MysqlSchemaDumper do
     end
 
     describe 'indexes' do
-      it do
+      it 'should be dump index of authors' do
         index = subject['authors'].indexes['index_authors_on_created_at']
         expect(index).not_to be_nil
         expect(index.index_columns).to eq(['created_at'])
+      end
+
+      it 'should be dump index of papers' do
+        index = subject['papers'].indexes['index_papers_on_title1_title2']
+        expect(index).not_to be_nil
+        expect(index.index_columns).to eq(['title1', 'title2'])
+        expect(index.options[:length]).to eq('title1' => 100, 'title2' => 200)
       end
     end
 
