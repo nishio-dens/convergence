@@ -5,8 +5,13 @@ describe Convergence::DSL do
     <<-DSL
     create_table "users", comment: 'Users' do |t|
       t.int "id", primary_key: true, null: false, limit: 11, extra: "auto_increment"
+      t.varchar "email"
+      t.varchar "first_name"
+      t.varchar "last_name"
       t.datetime "created_at", null: true
 
+      t.index 'email', length: 100
+      t.index ['first_name', 'last_name'], length: { first_name: 15, last_name: 20 }
       t.index 'created_at'
       t.foreign_key "user_id", reference: "users", reference_column: "id"
     end
@@ -58,7 +63,13 @@ describe Convergence::DSL do
       end
 
       it 'should be able to parse indexes' do
-        expect(subject['users'].indexes).not_to be_nil
+        indexes = subject['users'].indexes
+        expect(indexes).not_to be_nil
+        expect(indexes['index_users_on_email']).not_to be_nil
+        expect(indexes['index_users_on_email'].options[:length]['email']).to eq(100)
+        expect(indexes['index_users_on_first_name_last_name']).not_to be_nil
+        expect(indexes['index_users_on_first_name_last_name'].options[:length]['first_name']).to eq(15)
+        expect(indexes['index_users_on_first_name_last_name'].options[:length]['last_name']).to eq(20)
       end
 
       it 'should be able to parse foreign keys' do
