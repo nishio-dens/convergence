@@ -6,7 +6,10 @@ class Convergence::Diff
     from_database = {} if from_database.nil?
     delta[:add_table] = scan_add_table(from_database, to_database)
     delta[:remove_table] = scan_remove_table(from_database, to_database)
-    delta[:change_table] = scan_change_table(from_database, to_database)
+    change_table = scan_change_table(from_database, to_database)
+    delta[:change_table] = change_table[:change]
+    delta[:remove_table].merge!(change_table[:remove])
+    delta[:add_table].merge!(change_table[:add])
     delta
   end
 
@@ -14,8 +17,9 @@ class Convergence::Diff
     from = from_table.dup
     to = to_table.dup
     delta = {}
-    delta[:add_column] = scan_add_column(from, to)
     delta[:remove_column] = scan_remove_column(from, to)
+    return delta if removed_all_columns?(from, delta)
+    delta[:add_column] = scan_add_column(from, to)
     delta[:change_column] = scan_change_column(from, to)
     scan_change_order_column(from, to, delta)
     delta[:remove_index] = scan_change_index(to, from)
@@ -37,14 +41,19 @@ class Convergence::Diff
   end
 
   def scan_change_table(from, to)
-    delta = {}
+    delta = { change: {}, remove: {}, add: {}}
     target_tables = from.map { |name, _| name } & to.map { |name, _| name }
     target_tables.each do |target_table|
       from_table = from.find { |name, _| name == target_table }[1]
       to_table = to.find { |name, _| name == target_table }[1]
       diff = diff_table(from_table, to_table)
       unless diff.values.all?(&:empty?)
-        delta[target_table] = diff
+        if removed_all_columns?(from_table, diff)
+          delta[:remove][target_table] = from_table
+          delta[:add][target_table] = to_table
+        else
+          delta[:change][target_table] = diff
+        end
       end
     end
     delta
@@ -144,5 +153,9 @@ class Convergence::Diff
         !from.table_options[k].nil? && from.table_options[k].to_s.downcase == v.to_s.downcase
       end
     Hash[change_options]
+  end
+
+  def removed_all_columns?(from_table, diff)
+    from_table.columns.each_key.all? { |name| diff[:remove_column].each_key.include?(name) }
   end
 end
