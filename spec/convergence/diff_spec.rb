@@ -110,6 +110,25 @@ describe Convergence::DSL do
           expect(results[:change_table]).not_to be_empty
         end
       end
+
+      context 'all columns are replaced' do
+        let(:table_to) do
+          Convergence::Table.new('table1').tap do |t|
+            t.int('id_rename', primary_key: true)
+            t.varchar('name_rename', limit: 200, null: false)
+            t.varchar('data_rename', limit: 300, null: false)
+          end
+        end
+
+        it do
+          results = Convergence::Diff.new.diff({ 'table1' => table_from }, { 'table1' => table_to })
+          expect(results[:add_table]).not_to be_empty
+          expect(results[:remove_table]).not_to be_empty
+          expect(results[:change_table]).to be_empty
+          included_after_option = results[:add_table].each_value.map { |t| t.columns.each_value.map { |c| c.options.key?(:after) } }.flatten.any?
+          expect(included_after_option).to eq false
+        end
+      end
     end
   end
 

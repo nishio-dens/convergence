@@ -15,8 +15,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     sqls = []
     sqls << change_table_sql(to_table, delta)
     sqls << ['']
-    sqls << create_table_sqls(delta)
     sqls << drop_table_sqls(delta)
+    sqls << create_table_sqls(delta)
     sqls.join("\n")
   end
 
