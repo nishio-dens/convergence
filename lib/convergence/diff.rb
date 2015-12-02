@@ -79,7 +79,7 @@ class Convergence::Diff
       end
     change_columns
       .compact
-      .reduce { |a, e| a.merge(e) }
+      .reduce({}) { |a, e| a.merge(e) }
       .reject { |_k, v| v.empty? }
   end
 
