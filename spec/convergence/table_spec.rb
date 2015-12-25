@@ -20,6 +20,11 @@ describe Convergence::Table do
       table.int(dummy_column, limit: 100)
       expect(table.columns[dummy_column].options[:limit]).to eq(100)
     end
+
+    it 'should convert the default value to float for floating-point columns' do
+      table.decimal(dummy_column, default: 1)
+      expect(table.columns[dummy_column].options[:default]).to eq(1.0)
+    end
   end
 
   describe '#index' do

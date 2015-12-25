@@ -27,6 +27,11 @@ class Convergence::Column
     timestamp
     year
   )
+  FLOATING_POINT_COLUMN_TYPE = %i(
+    float
+    double
+    decimal
+  )
 
   def initialize(type, column_name, options = {})
     @type = type

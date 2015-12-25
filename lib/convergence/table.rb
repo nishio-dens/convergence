@@ -3,6 +3,9 @@ class Convergence::Table
 
   Convergence::Column::COLUMN_TYPE.each do |column_type|
     define_method "#{column_type}" do |column_name, options = {}|
+      if Convergence::Column::FLOATING_POINT_COLUMN_TYPE.include?(column_type) && !options[:default].nil?
+        options[:default] = options[:default].to_f
+      end
       @columns[column_name.to_s] = Convergence::Column.new(column_type, column_name.to_s, options)
     end
   end
