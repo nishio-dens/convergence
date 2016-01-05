@@ -39,7 +39,7 @@ class Convergence::Table
 
   def initialize(table_name, options = {})
     @table_name = table_name
-    @table_options = options
+    @table_options = options.reject { |k| k == :id }
     @columns = {}
     @indexes = {}
     @foreign_keys = {}
