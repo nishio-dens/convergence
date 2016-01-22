@@ -73,8 +73,33 @@ class Convergence::Dumper::MysqlSchemaDumper
         AND KCU.CONSTRAINT_NAME = TC.CONSTRAINT_NAME
       WHERE
         S.TABLE_SCHEMA = '#{mysql.escape(database_name)}'
-      ORDER BY
-        S.TABLE_NAME, S.INDEX_NAME, S.SEQ_IN_INDEX
+
+      UNION ALL
+
+      SELECT
+        DISTINCT KCU.TABLE_NAME, KCU.COLUMN_NAME, NULL AS SUB_PART, 0 AS NON_UNIQUE, TC.CONSTRAINT_NAME, 1 AS SEQ_IN_INDEX, '' AS INDEX_TYPE,
+        TC.CONSTRAINT_TYPE,
+        KCU.REFERENCED_TABLE_NAME, KCU.REFERENCED_COLUMN_NAME
+      FROM
+        TABLE_CONSTRAINTS TC
+      LEFT OUTER JOIN
+        KEY_COLUMN_USAGE KCU
+      ON
+        KCU.CONSTRAINT_SCHEMA = TC.TABLE_SCHEMA
+        AND KCU.TABLE_NAME = TC.TABLE_NAME
+        AND KCU.CONSTRAINT_NAME = TC.CONSTRAINT_NAME
+      WHERE
+        TC.TABLE_SCHEMA = '#{mysql.escape(database_name)}'
+        AND NOT EXISTS (
+          SELECT
+            'X'
+          FROM
+            STATISTICS S
+          WHERE
+            S.TABLE_SCHEMA = TC.TABLE_SCHEMA
+            AND S.TABLE_NAME = TC.TABLE_NAME
+            AND TC.CONSTRAINT_NAME = S.INDEX_NAME
+        )
     ")
   end
 
