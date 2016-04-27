@@ -144,7 +144,7 @@ You need to make database.yml to access your database.
 
 ```
 $ cat database.yml
-dapter: mysql
+adapter: mysql
 database: convergence_test
 host: 127.0.0.1
 username: root
