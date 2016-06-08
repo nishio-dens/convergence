@@ -1,6 +1,8 @@
 require 'diff/lcs'
 
 class Convergence::Diff
+  CASE_SENSITIVE_COLUMNS = %i(default comment)
+
   def diff(from_database, to_database)
     delta = {}
     from_database = {} if from_database.nil?
@@ -76,12 +78,12 @@ class Convergence::Diff
           to_column_option_with_type = (from_column.options.map { |k, _v| { k => nil } }.reduce { |a, e| a.merge(e) } || {})
             .merge(to_column.options)
             .merge(type: to_column.type)
-            .map { |k, v| [k, v.to_s.downcase] }
+            .map { |k, v| [k, case_sensitive_column?(k) ? v.to_s : v.to_s.downcase] }
             .to_a
           from_column_option_with_type = from_column
             .options
             .merge(type: from_column.type)
-            .map { |k, v| [k, v.to_s.downcase] }
+            .map { |k, v| [k, case_sensitive_column?(k) ? v.to_s : v.to_s.downcase] }
             .to_a
           { column_name => Hash[(to_column_option_with_type - from_column_option_with_type)] }
         end
@@ -157,5 +159,9 @@ class Convergence::Diff
 
   def removed_all_columns?(from_table, diff)
     from_table.columns.each_key.all? { |name| diff[:remove_column].each_key.include?(name) }
+  end
+
+  def case_sensitive_column?(column)
+    CASE_SENSITIVE_COLUMNS.include?(column)
   end
 end
