@@ -169,7 +169,7 @@ class Convergence::Diff
   end
 
   def remove_auto_increment_option?(from_value, to_value)
-    return false if from_value.nil? || to_value.nil?
+    return true if from_value.nil? || to_value.nil?
     from_value >= to_value
   end
 end
