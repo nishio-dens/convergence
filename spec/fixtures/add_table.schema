@@ -26,3 +26,7 @@ end
 create_table 'dummies', comment: 'Dummy Table' do |t|
   t.int "id", primary_key: true, extra: "auto_increment", comment: 'Hello Convergence'
 end
+
+create_table 'dummies2', auto_increment: 1000 do |t|
+  t.int :id, primary_key: true, extra: :auto_increment
+end

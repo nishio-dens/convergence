@@ -72,4 +72,24 @@ describe 'Command::Dryrun#execute' do
       end
     end
   end
+
+  describe 'auto increment' do
+    describe 'create table with auto increment option' do
+      let(:exec_dsl) { 'add_table.schema' }
+      let(:expected_query) do
+      q = <<-QUERY
+# CREATE TABLE `dummies2` (
+#   `id` int(11) NOT NULL AUTO_INCREMENT,
+#   PRIMARY KEY (`id`)
+# ) ENGINE=InnoDB ROW_FORMAT=Compact DEFAULT CHARACTER SET=utf8 AUTO_INCREMENT=1000 COLLATE=utf8_general_ci
+      QUERY
+      q.strip
+      end
+
+      it 'should be create table with auto increment options' do
+        result = execute(exec_dsl)
+        expect(result).to be_include(expected_query)
+      end
+    end
+  end
 end
