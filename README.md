@@ -296,6 +296,13 @@ create_table "authors", comment: 'Author', engine: 'MyISAM', collate: "utf8_gene
 end
 ```
 
+### auto increment
+
+```
+create_table "orders", auto_increment: 1000 do |t|
+  t.int :id, primary_key: true, extra: :auto_increment
+end
+```
 
 ## Test
 
