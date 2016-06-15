@@ -154,6 +154,9 @@ class Convergence::Diff
       .reject do |k, v|
         !from.table_options[k].nil? && from.table_options[k].to_s.downcase == v.to_s.downcase
       end
+    if remove_auto_increment_option?(from.table_options[:auto_increment], to.table_options[:auto_increment])
+      change_options.delete(:auto_increment)
+    end
     Hash[change_options]
   end
 
@@ -163,5 +166,10 @@ class Convergence::Diff
 
   def case_sensitive_column?(column)
     CASE_SENSITIVE_COLUMNS.include?(column)
+  end
+
+  def remove_auto_increment_option?(from_value, to_value)
+    return false if from_value.nil? || to_value.nil?
+    from_value >= to_value
   end
 end

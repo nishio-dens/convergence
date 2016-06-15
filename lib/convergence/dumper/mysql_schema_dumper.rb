@@ -111,6 +111,7 @@ class Convergence::Dumper::MysqlSchemaDumper
     option.merge!(default_charset: table_option['CHARACTER_SET_NAME'])
     option.merge!(collate: table_option['TABLE_COLLATION'])
     option.merge!(comment: table_option['TABLE_COMMENT'])
+    option.merge!(auto_increment: table_option['AUTO_INCREMENT']) if table_option['AUTO_INCREMENT']
     table.table_options = option
   end
 

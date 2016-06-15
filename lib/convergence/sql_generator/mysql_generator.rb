@@ -4,7 +4,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     row_format: 'ROW_FORMAT',
     default_charset: 'DEFAULT CHARACTER SET',
     collate: 'COLLATE',
-    comment: 'COMMENT'
+    comment: 'COMMENT',
+    auto_increment: 'AUTO_INCREMENT'
   }
   QUOTE_OPTION = [:comment]
 
