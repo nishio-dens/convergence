@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    convergence (0.1.7)
+    convergence (0.1.8)
       diff-lcs
       diffy
       mysql2
