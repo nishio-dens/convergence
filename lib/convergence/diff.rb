@@ -1,6 +1,7 @@
 require 'diff/lcs'
 
 class Convergence::Diff
+  CASE_SENSITIVE_TABLE_OPTIONS = %i(comment)
   CASE_SENSITIVE_COLUMNS = %i(default comment)
 
   def diff(from_database, to_database)
@@ -152,7 +153,8 @@ class Convergence::Diff
     change_options = (from.table_options.map { |k, _v| { k => nil } }.reduce { |a, e| a.merge(e) } || {})
       .merge(to.table_options)
       .reject do |k, v|
-        !from.table_options[k].nil? && from.table_options[k].to_s.downcase == v.to_s.downcase
+        next false if from.table_options[k].nil?
+        case_sensitive_table_option?(k) ? from.table_options[k].to_s == v.to_s : from.table_options[k].to_s.downcase == v.to_s.downcase
       end
     if remove_auto_increment_option?(from.table_options[:auto_increment], to.table_options[:auto_increment])
       change_options.delete(:auto_increment)
@@ -162,6 +164,10 @@ class Convergence::Diff
 
   def removed_all_columns?(from_table, diff)
     from_table.columns.each_key.all? { |name| diff[:remove_column].each_key.include?(name) }
+  end
+
+  def case_sensitive_table_option?(option)
+    CASE_SENSITIVE_TABLE_OPTIONS.include?(option)
   end
 
   def case_sensitive_column?(column)
