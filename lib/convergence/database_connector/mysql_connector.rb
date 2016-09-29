@@ -1,3 +1,4 @@
+require 'mysql2'
 class Convergence::DatabaseConnector::MysqlConnector
   attr_reader :config
 

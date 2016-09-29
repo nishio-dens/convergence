@@ -1,4 +1,3 @@
-require 'mysql2'
 class Convergence::Dumper::MysqlSchemaDumper
   def initialize(connector)
     @connector = connector
