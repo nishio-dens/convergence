@@ -10,36 +10,22 @@ class Convergence::Command::Apply < Convergence::Command
   def execute
     validate!
     current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
-    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
+    input_tables, hooks = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
     current_tables = dumper.dump
-    execute_sql(input_tables, current_tables)
+
+    sql_executor = Convergence::SqlExecutor.new(@opts, config: @config)
+
+    hook_executor = Convergence::HookExecutor.new(input_tables, current_tables, sql_executor, hooks)
+    hook_executor.execute
+
+    current_tables = dumper.dump if hook_executor.before_apply?
+
+    sql = generate_sql(input_tables, current_tables)
+    sql_executor.execute(sql)
   end
 
-  def execute_sql(input_tables, current_tables)
-    sql = generate_sql(input_tables, current_tables)
-    unless sql.strip.empty?
-      sql = <<-SQL
-SET FOREIGN_KEY_CHECKS=0;
-      #{sql}
-SET FOREIGN_KEY_CHECKS=1;
-      SQL
-    end
-    sql.split(';').each do |q2|
-      q = q2.strip
-      unless q.empty?
-        begin
-          q = q + ';'
-          time = Benchmark.realtime { connector.client.query(q) }
-          logger.output q
-          logger.output "  --> #{time}s"
-        rescue => e
-          logger.output 'Invalid Query Exception >>>'
-          logger.output q
-          logger.output '<<<'
-          throw e
-        end
-      end
-    end
+  def execute_sql(input_tables, current_tables, sql_executor)
+    sql_executor.execute(sql)
   end
 
   def generate_sql(input_tables, current_tables)

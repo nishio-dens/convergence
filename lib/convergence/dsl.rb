@@ -1,8 +1,9 @@
 class Convergence::DSL
-  attr_accessor :tables, :current_dir_path
+  attr_accessor :tables, :current_dir_path, :hooks
 
   def initialize
     @tables = {}
+    @hooks = {}
   end
 
   def create_table(table_name, options = {}, &block)
@@ -17,10 +18,15 @@ class Convergence::DSL
     @tables.merge!(Convergence::DSL.parse(File.open("#{current_dir_path}/#{path}").read, next_dir_path))
   end
 
+  def before_apply(&block)
+    hooks[:before_apply] ||= []
+    hooks[:before_apply] << block
+  end
+
   def self.parse(code, current_dir_path)
     parser = new
     parser.current_dir_path = current_dir_path
     parser.instance_eval(code)
-    parser.tables
+    [parser.tables, parser.hooks]
   end
 end

@@ -8,7 +8,10 @@ class Convergence::Command::Dryrun < Convergence::Command
   def execute
     validate!
     current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
-    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
+    input_tables, hooks = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
+
+    # TODO: FIXME use hooks
+
     current_tables = dumper.dump
     # -- maybe it's redundant output
     # output_diff(input_tables, current_tables)
