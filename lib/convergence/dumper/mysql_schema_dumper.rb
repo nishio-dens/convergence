@@ -138,6 +138,9 @@ class Convergence::Dumper::MysqlSchemaDumper
       limit = column_type.scan(/\d+/)[0]
       options.merge!(limit: limit) unless limit.nil?
     end
+    if column_type.downcase.include?('unsigned')
+      options.merge!(unsigned: true)
+    end
     options.merge!(extra: column['EXTRA']) unless column['EXTRA'].empty?
     options.merge!(comment: column['COLUMN_COMMENT']) unless column['COLUMN_COMMENT'].empty?
     [data_type, column_name, options]

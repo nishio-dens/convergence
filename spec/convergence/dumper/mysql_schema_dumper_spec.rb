@@ -63,6 +63,10 @@ describe Convergence::Dumper::MysqlSchemaDumper do
           expect(subject['papers'].columns['title1'].options[:null]).to be_falsy
           expect(subject['authors'].columns['created_at'].options[:null]).to be_truthy
         end
+
+        it 'should be dump unsigned definition' do
+          expect(subject['authors'].columns['age'].options[:unsigned]).to be_truthy
+        end
       end
     end
 

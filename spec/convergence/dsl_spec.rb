@@ -8,6 +8,7 @@ describe Convergence::DSL do
       t.varchar "email"
       t.varchar "first_name"
       t.varchar "last_name"
+      t.int "age", unsigned: true
       t.datetime "created_at", null: true
 
       t.index 'email', length: 100
@@ -60,6 +61,7 @@ describe Convergence::DSL do
         expect(columns['id'].options[:null]).to be_falsy
         expect(columns['id'].options[:limit]).to eq(11)
         expect(columns['id'].options[:extra]).to eq('auto_increment')
+        expect(columns['age'].options[:unsigned]).to be_truthy
       end
 
       it 'should be able to parse indexes' do

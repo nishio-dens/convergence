@@ -147,7 +147,7 @@ describe Convergence::DSL do
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
           t.int('id', primary_key: true)
-          t.varchar('name', limit: 300, null: true)
+          t.varchar('name', limit: 300, null: true, unsigned: true)
 
           t.index('name')
         end
@@ -158,6 +158,7 @@ describe Convergence::DSL do
         expect(results[:change_column]['name']).not_to be_nil
         expect(results[:change_column]['name'][:limit]).to eq('300')
         expect(results[:change_column]['name'][:null]).to eq('true')
+        expect(results[:change_column]['name'][:unsigned]).to eq('true')
       end
     end
 
