@@ -152,6 +152,9 @@ DROP TABLE `#{table_name}`;
     if column.options[:precision] && column.options[:scale]
       sql += "(#{column.options[:precision]}, #{column.options[:scale]})"
     end
+    if column.options[:unsigned]
+      sql += ' UNSIGNED'
+    end
     if column.options[:character_set]
       sql += " CHARACTER SET #{column.options[:character_set]}"
     end

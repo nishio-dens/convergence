@@ -1,5 +1,6 @@
 create_table "authors", collate: "utf8_general_ci", comment: "" do |t|
   t.int "id", primary_key: true, extra: "auto_increment"
+  t.int "age", unsigned: true
   t.datetime "created_at", null: true
   t.datetime "updated_at", null: true
 
