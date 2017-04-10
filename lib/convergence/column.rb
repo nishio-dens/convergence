@@ -15,6 +15,7 @@ class Convergence::Column
     tinyblob
     blob
     mediumblob
+    longblob
     tinytext
     text
     mediumtext
