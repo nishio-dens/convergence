@@ -228,6 +228,7 @@ Convergence is currently support column types below.
 - tinyblob
 - blob
 - mediumblob
+- longblob
 - tinytext
 - text
 - mediumtext
