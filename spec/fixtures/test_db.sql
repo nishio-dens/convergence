@@ -4,10 +4,12 @@ DROP TABLE IF EXISTS `authors`;
 
 CREATE TABLE `papers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `slug` varchar(255) NOT NULL COMMENT 'Slug',
   `title1` varchar(300) NOT NULL COMMENT 'Title 1',
   `title2` varchar(300) NOT NULL COMMENT 'Title 2',
   `description` text COMMENT 'Description',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `index_papers_on_slug` (`slug`),
   KEY `index_papers_on_title1_title2` (`title1` (100), `title2` (200))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='Paper';
 
