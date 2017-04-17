@@ -70,7 +70,7 @@ class Convergence::DefaultParameter::MysqlDefaultParameter
       limit: 255
     }
   }
-  DEFAULT_INDEX_PARAMETERS = { type: 'BTREE' }
+  DEFAULT_INDEX_PARAMETERS = { type: 'BTREE', unique: false }
 
   def initialize
   end

@@ -39,7 +39,7 @@ describe Convergence::Dumper::MysqlSchemaDumper do
 
       it 'should be dump columns in the correct order' do
         papers = subject['papers']
-        expect(papers.columns.keys).to eq(%w(id title1 title2 description))
+        expect(papers.columns.keys).to eq(%w(id slug title1 title2 description))
       end
 
       describe 'table options' do
@@ -75,13 +75,22 @@ describe Convergence::Dumper::MysqlSchemaDumper do
         index = subject['authors'].indexes['index_authors_on_created_at']
         expect(index).not_to be_nil
         expect(index.index_columns).to eq(['created_at'])
+        expect(index.options[:unique]).to eq(false)
       end
 
-      it 'should be dump index of papers' do
+      it 'should be dump unique index of papers' do
+        index = subject['papers'].indexes['index_papers_on_slug']
+        expect(index).not_to be_nil
+        expect(index.index_columns).to eq(['slug'])
+        expect(index.options[:unique]).to eq(true)
+      end
+
+      it 'should be dump non-unique index of papers' do
         index = subject['papers'].indexes['index_papers_on_title1_title2']
         expect(index).not_to be_nil
         expect(index.index_columns).to eq(['title1', 'title2'])
         expect(index.options[:length]).to eq('title1' => 100, 'title2' => 200)
+        expect(index.options[:unique]).to eq(false)
       end
     end
 

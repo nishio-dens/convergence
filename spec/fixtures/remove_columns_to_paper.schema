@@ -9,6 +9,7 @@ end
 
 create_table "papers", collate: "utf8_general_ci", comment: "Paper" do |t|
   t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "slug", comment: "Slug"
   t.varchar "title1", limit: 300, comment: "Title 1"
   t.varchar "title2", limit: 300, comment: "Title 2"
   t.text "description", null: true, comment: "Description"

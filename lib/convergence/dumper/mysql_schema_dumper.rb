@@ -158,8 +158,7 @@ class Convergence::Dumper::MysqlSchemaDumper
           table.columns[column].options = options
         end
       when 'INDEX', 'UNIQUE'
-        options = { name: index_name, type: indexes.first['INDEX_TYPE'] }
-        options.merge!(unique: true) if type == 'UNIQUE'
+        options = { name: index_name, type: indexes.first['INDEX_TYPE'], unique: type == 'UNIQUE' }
         length = indexes.reject { |v| v['SUB_PART'].nil? }.reduce({}) { |a, e| a[e['COLUMN_NAME']] = e['SUB_PART']; a }
         options.merge!(length: length) unless length.empty?
         table.index(columns, options)
