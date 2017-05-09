@@ -52,19 +52,19 @@ class Convergence::DefaultParameter::MysqlDefaultParameter
   TEXT_TYPE = [:varchar, :char, :tiny_text, :text, :mediumtext, :longtext]
   DEFAULT_COLUMN_TYPE_PARAMETERS = {
     tinyint: {
-      limit: 3
+      limit: 4
     },
     smallint: {
-      limit: 5
+      limit: 6
     },
     mediumint: {
-      limit: 8
+      limit: 9
     },
     int: {
       limit: 11
     },
     bigint: {
-      limit: 19
+      limit: 20
     },
     varchar: {
       limit: 255
