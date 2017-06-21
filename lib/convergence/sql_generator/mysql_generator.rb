@@ -34,8 +34,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
       table_delta[:remove_index].each do |index_name, _index|
         results << alter_remove_index_sql(table_name, index_name)
       end
-      table_delta[:remove_column].each do |_column_name, column|
-        results << alter_remove_column_sql(table_name, column)
+      unless table_delta[:remove_column].empty?
+        results << alter_remove_columns_sql(table_name, table_delta[:remove_column].values)
       end
       table_delta[:add_column].each do |_column_name, column|
         results << alter_add_column_sql(table_name, column)
@@ -60,8 +60,11 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     %(ALTER TABLE `#{table_name}` ADD COLUMN #{create_column_sql(column, output_primary_key: true)};)
   end
 
-  def alter_remove_column_sql(table_name, column)
-    %(ALTER TABLE `#{table_name}` DROP COLUMN `#{column.column_name}`;)
+  def alter_remove_columns_sql(table_name, columns)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += columns.map { |column| %(  DROP COLUMN `#{column.column_name}`) }.join(",\n")
+    sql += ';'
+    sql
   end
 
   def alter_change_column_sql(table_name, column_name, change_column_option, to_table)

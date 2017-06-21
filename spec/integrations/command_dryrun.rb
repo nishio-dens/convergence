@@ -58,7 +58,7 @@ describe 'Command::Dryrun#execute' do
 
     it 'should be output alter drop column query' do
       result = execute(exec_dsl)
-      expect(result).to be_include('# ALTER TABLE `authors` DROP COLUMN `name`;')
+      expect(result).to be_include("# ALTER TABLE `authors`\n#   DROP COLUMN `name`;")
     end
   end
 
