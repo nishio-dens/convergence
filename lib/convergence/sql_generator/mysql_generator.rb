@@ -46,8 +46,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
       table_delta[:add_index].each do |_index_name, index|
         results << alter_add_index_sql(table_name, index)
       end
-      table_delta[:add_foreign_key].each do |_index_name, foreign_key|
-        results << alter_add_foreign_key_sql(table_name, foreign_key)
+      unless table_delta[:add_foreign_key].empty?
+        results << alter_add_foreign_keys_sql(table_name, table_delta[:add_foreign_key].values)
       end
       unless table_delta[:change_table_option].empty?
         results << alter_change_table_sql(table_name, table_delta[:change_table_option])
@@ -116,10 +116,17 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     sql
   end
 
-  def alter_add_foreign_key_sql(table_name, foreign_key)
-    sql = %(ALTER TABLE `#{table_name}` ADD CONSTRAINT `#{foreign_key.key_name}` FOREIGN KEY )
+  def alter_add_foreign_keys_sql(table_name, foreign_keys)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += foreign_keys.map { |foreign_key| alter_add_foreign_key_sql(foreign_key) }.join(",\n")
+    sql += ';'
+    sql
+  end
+
+  def alter_add_foreign_key_sql(foreign_key)
+    sql = %(  ADD CONSTRAINT `#{foreign_key.key_name}` FOREIGN KEY )
     sql += "(#{[foreign_key.from_columns].join(',')}) REFERENCES `#{foreign_key.to_table}`"
-    sql += "(#{[foreign_key.to_columns].join(',')});"
+    sql += "(#{[foreign_key.to_columns].join(',')})"
     sql
   end
 
