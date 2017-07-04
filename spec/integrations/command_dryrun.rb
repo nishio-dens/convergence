@@ -49,7 +49,7 @@ describe 'Command::Dryrun#execute' do
 
     it 'should be output alter add column query' do
       result = execute(exec_dsl)
-      expect(result).to be_include('# ALTER TABLE `authors` ADD COLUMN `add_column` varchar(110) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL AFTER `name`;')
+      expect(result).to be_include("# ALTER TABLE `authors`\n#   ADD COLUMN `add_column` varchar(110) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL AFTER `name`;")
     end
   end
 
@@ -58,7 +58,7 @@ describe 'Command::Dryrun#execute' do
 
     it 'should be output alter drop column query' do
       result = execute(exec_dsl)
-      expect(result).to be_include('# ALTER TABLE `authors` DROP COLUMN `name`;')
+      expect(result).to be_include("# ALTER TABLE `authors`\n#   DROP COLUMN `name`;")
     end
   end
 

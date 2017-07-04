@@ -28,17 +28,17 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     change_table = delta[:change_table]
     results = []
     change_table.each do |table_name, table_delta|
-      table_delta[:remove_foreign_key].each do |index_name, _foreign_key|
-        results << alter_remove_foreign_key_sql(table_name, index_name)
+      unless table_delta[:remove_foreign_key].empty?
+        results << alter_remove_foreign_keys_sql(table_name, table_delta[:remove_foreign_key].keys)
       end
       table_delta[:remove_index].each do |index_name, _index|
         results << alter_remove_index_sql(table_name, index_name)
       end
-      table_delta[:remove_column].each do |_column_name, column|
-        results << alter_remove_column_sql(table_name, column)
+      unless table_delta[:remove_column].empty?
+        results << alter_remove_columns_sql(table_name, table_delta[:remove_column].values)
       end
-      table_delta[:add_column].each do |_column_name, column|
-        results << alter_add_column_sql(table_name, column)
+      unless table_delta[:add_column].empty?
+        results << alter_add_columns_sql(table_name, table_delta[:add_column].values)
       end
       table_delta[:change_column].each do |column_name, column|
         results << alter_change_column_sql(table_name, column_name, column, to_table)
@@ -46,8 +46,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
       table_delta[:add_index].each do |_index_name, index|
         results << alter_add_index_sql(table_name, index)
       end
-      table_delta[:add_foreign_key].each do |_index_name, foreign_key|
-        results << alter_add_foreign_key_sql(table_name, foreign_key)
+      unless table_delta[:add_foreign_key].empty?
+        results << alter_add_foreign_keys_sql(table_name, table_delta[:add_foreign_key].values)
       end
       unless table_delta[:change_table_option].empty?
         results << alter_change_table_sql(table_name, table_delta[:change_table_option])
@@ -56,12 +56,18 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     results
   end
 
-  def alter_add_column_sql(table_name, column)
-    %(ALTER TABLE `#{table_name}` ADD COLUMN #{create_column_sql(column, output_primary_key: true)};)
+  def alter_add_columns_sql(table_name, columns)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += columns.map { |column| %(  ADD COLUMN #{create_column_sql(column, output_primary_key: true)}) }.join(",\n")
+    sql += ';'
+    sql
   end
 
-  def alter_remove_column_sql(table_name, column)
-    %(ALTER TABLE `#{table_name}` DROP COLUMN `#{column.column_name}`;)
+  def alter_remove_columns_sql(table_name, columns)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += columns.map { |column| %(  DROP COLUMN `#{column.column_name}`) }.join(",\n")
+    sql += ';'
+    sql
   end
 
   def alter_change_column_sql(table_name, column_name, change_column_option, to_table)
@@ -104,16 +110,25 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     sql
   end
 
-  def alter_remove_foreign_key_sql(table_name, index_name)
-    sql = %(ALTER TABLE `#{table_name}` DROP FOREIGN KEY `#{index_name}`;\n)
-    sql += alter_remove_index_sql(table_name, index_name)
+  def alter_remove_foreign_keys_sql(table_name, index_names)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += index_names.map { |index_name| %(  DROP FOREIGN KEY `#{index_name}`) }.join(",\n")
+    sql += ';'
+    sql += index_names.map { |index_name| alter_remove_index_sql(table_name, index_name) }.join("\n")
     sql
   end
 
-  def alter_add_foreign_key_sql(table_name, foreign_key)
-    sql = %(ALTER TABLE `#{table_name}` ADD CONSTRAINT `#{foreign_key.key_name}` FOREIGN KEY )
+  def alter_add_foreign_keys_sql(table_name, foreign_keys)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += foreign_keys.map { |foreign_key| alter_add_foreign_key_sql(foreign_key) }.join(",\n")
+    sql += ';'
+    sql
+  end
+
+  def alter_add_foreign_key_sql(foreign_key)
+    sql = %(  ADD CONSTRAINT `#{foreign_key.key_name}` FOREIGN KEY )
     sql += "(#{[foreign_key.from_columns].join(',')}) REFERENCES `#{foreign_key.to_table}`"
-    sql += "(#{[foreign_key.to_columns].join(',')});"
+    sql += "(#{[foreign_key.to_columns].join(',')})"
     sql
   end
 
