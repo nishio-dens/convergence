@@ -28,8 +28,8 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     change_table = delta[:change_table]
     results = []
     change_table.each do |table_name, table_delta|
-      table_delta[:remove_foreign_key].each do |index_name, _foreign_key|
-        results << alter_remove_foreign_key_sql(table_name, index_name)
+      unless table_delta[:remove_foreign_key].empty?
+        results << alter_remove_foreign_keys_sql(table_name, table_delta[:remove_foreign_key].keys)
       end
       table_delta[:remove_index].each do |index_name, _index|
         results << alter_remove_index_sql(table_name, index_name)
@@ -110,9 +110,11 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     sql
   end
 
-  def alter_remove_foreign_key_sql(table_name, index_name)
-    sql = %(ALTER TABLE `#{table_name}` DROP FOREIGN KEY `#{index_name}`;\n)
-    sql += alter_remove_index_sql(table_name, index_name)
+  def alter_remove_foreign_keys_sql(table_name, index_names)
+    sql = %(ALTER TABLE `#{table_name}`\n)
+    sql += index_names.map { |index_name| %(  DROP FOREIGN KEY `#{index_name}`) }.join(",\n")
+    sql += ';'
+    sql += index_names.map { |index_name| alter_remove_index_sql(table_name, index_name) }.join("\n")
     sql
   end
 
