@@ -4,7 +4,6 @@ PATH
     convergence (0.2.2)
       diff-lcs
       diffy
-      mysql2
       slop (~> 3.6)
 
 GEM
@@ -44,6 +43,7 @@ GEM
     parallel (1.12.0)
     parser (2.4.0.2)
       ast (~> 2.3)
+    pg (0.21.0)
     powerpack (0.1.1)
     pry (0.11.3)
       coderay (~> 1.1.0)
@@ -89,6 +89,8 @@ DEPENDENCIES
   convergence!
   guard
   guard-rspec
+  mysql2
+  pg
   pry
   rake (~> 10.0)
   rspec
