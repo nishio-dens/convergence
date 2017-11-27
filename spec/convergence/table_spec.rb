@@ -66,13 +66,13 @@ describe Convergence::Table do
 
     context 'when reference is nil' do
       it 'should be raise error' do
-        expect { table.foreign_key(dummy_column, reference: nil, reference_column: 'dummy') }.to raise_error
+        expect { table.foreign_key(dummy_column, reference: nil, reference_column: 'dummy') }.to raise_error(ArgumentError)
       end
     end
 
     context 'when reference_column is nil' do
       it 'should be raise error' do
-        expect { table.foreign_key(dummy_column, reference: 'dummy', reference_column: nil) }.to raise_error
+        expect { table.foreign_key(dummy_column, reference: 'dummy', reference_column: nil) }.to raise_error(ArgumentError)
       end
     end
 
