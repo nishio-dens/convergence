@@ -9,7 +9,7 @@ class Convergence::Index
     case length
     when Hash
       @options[:length] = Hash[length.map { |k, v| [k.to_s, v] }]
-    when Fixnum
+    when Integer
       @options[:length] = Hash[@index_columns.map { |col| [col, length] }]
     end
   end
