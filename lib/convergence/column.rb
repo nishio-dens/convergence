@@ -37,8 +37,8 @@ class Convergence::Column
   )
   POSTGRES_COLUMN_MAPPINGS = [
     # Postgres Type, Convergence Type
-    [:int8,          :int],
-    [:int4,          :smallint],
+    [:int8,          :bigint],
+    [:int4,          :int],
     [:bool,          :boolean],
     [:timestamp,     :datetime]
   ]
