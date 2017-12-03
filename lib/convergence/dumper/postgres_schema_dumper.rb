@@ -85,7 +85,7 @@ class Convergence::Dumper::PostgresSchemaDumper
   end
 
   def parse_column(column)
-    data_type = column['data_type']
+    data_type = to_convergence_type(column['udt_name'])
     column_name = column['column_name']
     options = { null: column['is_nullable'] == 'YES' ? true : false }
     options.merge!(default: column['column_default']) unless column['column_default'].nil?
@@ -95,6 +95,11 @@ class Convergence::Dumper::PostgresSchemaDumper
     # FIXME: Support precision
     # FIXME: Support Column Comment
     [data_type, column_name, options]
+  end
+
+  def to_convergence_type(postgres_type)
+    type_mapping = Convergence::Column::POSTGRES_COLUMN_MAPPINGS.find { |ptype, _convergence_type| postgres_type.to_sym == ptype }
+    type_mapping.nil? ? postgres_type : type_mapping[1]
   end
 
   def parse_indexes(table, table_indexes)
