@@ -66,6 +66,7 @@ class Convergence::Dumper::PostgresSchemaDumper
         AND TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME
       WHERE
         TC.TABLE_SCHEMA = 'public'
+        AND TC.CONSTRAINT_TYPE != 'CHECK'
     ")
   end
 
