@@ -37,6 +37,8 @@ class Convergence::Command
     @dumper ||= case database_adapter
                 when 'mysql', 'mysql2'
                   Convergence::Dumper::MysqlSchemaDumper.new(connector)
+                when 'postgres', 'postgresql'
+                  Convergence::Dumper::PostgresSchemaDumper.new(connector)
                 else
                   fail NotImplementedError.new('unknown database adapter')
                 end
