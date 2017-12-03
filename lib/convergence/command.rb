@@ -6,6 +6,7 @@ class Convergence::Command
     else
       @config = config
     end
+    require 'convergence/debug' if @opts[:debug]
   end
 
   def execute
