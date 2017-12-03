@@ -27,6 +27,8 @@ class Convergence::Column
     datetime
     timestamp
     year
+    json
+    inet
   )
   FLOATING_POINT_COLUMN_TYPE = %i(
     float
