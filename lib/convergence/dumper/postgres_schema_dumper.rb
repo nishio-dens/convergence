@@ -92,6 +92,9 @@ class Convergence::Dumper::PostgresSchemaDumper
     unless column['column_default'].nil?
       if column['column_default'] == 'NULL::character varying'
         # Nothing
+      elsif column['column_default'] =~ /^nextval\('(.*)_seq'::(.*)\)/
+        extra_column, _klass = $1, $2
+        options.merge!(extra: :auto_increment)
       else
         default_value = column['column_default']
           .gsub(/::character varying$/, "")
