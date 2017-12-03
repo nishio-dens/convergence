@@ -105,7 +105,7 @@ class Convergence::Dumper::PostgresSchemaDumper
   def parse_indexes(table, table_indexes)
     return if table_indexes.nil?
 
-    # FIXME: for postgres
+    return # FIXME: Not implemented yet for postgres
     table_indexes.group_by { |r| r['index_name'] }.each do |index_name, indexes|
       type = indexes.first['constraint_type']
       columns = indexes.map { |v| v['column_name'] }
