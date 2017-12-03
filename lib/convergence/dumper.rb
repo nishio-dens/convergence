@@ -6,7 +6,7 @@ class Convergence::Dumper
   end
 
   def dump_table_dsl(table)
-    table_argument = ["\"#{table.table_name}\""]
+    table_argument = [":#{table.table_name}"]
     table_argument << table.table_options.map { |k, v| key_value_text(k, v) }
     dsl = "create_table #{table_argument.flatten.join(', ')} do |t|\n"
     dsl += "  #{table.columns.map { |_, column| dump_column(column) }.join("\n  ")}"
@@ -27,33 +27,33 @@ class Convergence::Dumper
   private
 
   def dump_column(column)
-    argument = [%("#{column.column_name}")]
+    argument = [%(:#{column.column_name})]
     argument << column.options.map { |k, v| key_value_text(k, v) }
     "t.#{column.type} #{argument.flatten.join(', ')}"
   end
 
   def dump_index(index)
-    columns = single_or_multiple_text(index.index_columns)
+    columns = single_or_multiple_symbol(index.index_columns)
     argument = [columns]
     argument << index.options.map { |k, v| key_value_text(k, v) }
     "t.index #{argument.flatten.join(', ')}"
   end
 
   def dump_foreign_key(foreign_key)
-    columns = single_or_multiple_text(foreign_key.from_columns)
+    columns = single_or_multiple_symbol(foreign_key.from_columns)
     argument = [columns]
     argument << [key_value_text('reference', foreign_key.to_table)]
-    argument << ["reference_column: #{single_or_multiple_text(foreign_key.to_columns)}"]
+    argument << ["reference_column: #{single_or_multiple_symbol(foreign_key.to_columns)}"]
     argument << foreign_key.options.map { |k, v| key_value_text(k, v) }
     "t.foreign_key #{argument.flatten.join(', ')}"
   end
 
-  def single_or_multiple_text(values)
+  def single_or_multiple_symbol(values)
     values_array = [values].flatten
     if values_array.size == 1
-      %("#{values_array.first}")
+      ":#{values_array.first}"
     else
-      %(#{values})
+      %(#{values.map(&:to_sym)})
     end
   end
 
