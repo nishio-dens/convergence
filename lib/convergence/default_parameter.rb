@@ -3,6 +3,8 @@ class Convergence::DefaultParameter
     case adapter.downcase
     when 'mysql', 'mysql2'
       @parameter_klass = Convergence::DefaultParameter::MysqlDefaultParameter.new
+    when 'postgres', 'postgresql'
+      @parameter_klass = Convergence::DefaultParameter::PostgresDefaultParameter.new
     else
       fail NotImplementedError.new("unknown adapter #{config.adapter}.")
     end
