@@ -114,30 +114,15 @@ class Convergence::Dumper::PostgresSchemaDumper
   def parse_indexes(table, table_indexes)
     return if table_indexes.nil?
 
-    return # FIXME: Not implemented yet for postgres
     table_indexes.group_by { |r| r['index_name'] }.each do |index_name, indexes|
       type = indexes.first['constraint_type']
       columns = indexes.map { |v| v['column_name'] }
       case type
       when 'PRIMARY KEY'
-        indexes.map { |r| r['COLUMN_NAME'] }.each do |column|
+        indexes.map { |r| r['column_name'] }.each do |column|
           options = { primary_key: true }.merge(table.columns[column].options)
           table.columns[column].options = options
         end
-      when 'INDEX', 'UNIQUE'
-        options = { name: index_name, type: indexes.first['INDEX_TYPE'], unique: type == 'UNIQUE' }
-        length = indexes.reject { |v| v['SUB_PART'].nil? }.reduce({}) { |a, e| a[e['COLUMN_NAME']] = e['SUB_PART']; a }
-        options.merge!(length: length) unless length.empty?
-        table.index(columns, options)
-      when 'FOREIGN KEY'
-        to_table = indexes.first['REFERENCED_TABLE_NAME']
-        to_columns = indexes.map { |v| v['REFERENCED_COLUMN_NAME'] }
-        options = {
-          reference: to_table,
-          reference_column: to_columns,
-          name: index_name
-        }
-        table.foreign_key(columns, options)
       else
         fail NotImplementedError.new('Unknown index type')
       end
