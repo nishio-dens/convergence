@@ -86,7 +86,7 @@ class Convergence::Dumper::PostgresSchemaDumper
   end
 
   def parse_column(column)
-    data_type = to_convergence_type(column['udt_name'])
+    data_type, is_array = to_convergence_type(column['udt_name'])
     column_name = column['column_name']
     options = { null: column['is_nullable'] == 'YES' ? true : false }
     unless column['column_default'].nil?
@@ -99,6 +99,7 @@ class Convergence::Dumper::PostgresSchemaDumper
         options.merge!(default: default_value)
       end
     end
+    options.merge!(array: true) if is_array
     options.merge!(character_set: column['character_set_name']) unless column['character_set_name'].nil?
     column_type = column['column_type']
     # FIXME: Support precision
@@ -107,8 +108,15 @@ class Convergence::Dumper::PostgresSchemaDumper
   end
 
   def to_convergence_type(postgres_type)
-    type_mapping = Convergence::Column::POSTGRES_COLUMN_MAPPINGS.find { |ptype, _convergence_type| postgres_type.to_sym == ptype }
-    type_mapping.nil? ? postgres_type : type_mapping[1]
+    is_array = postgres_type.start_with?("_")
+    type = postgres_type.gsub(/^_/, "")
+    type_mapping = Convergence::Column::POSTGRES_COLUMN_MAPPINGS.find { |ptype, _convergence_type| type.to_sym == ptype }
+
+    if type_mapping.nil?
+      [type, is_array]
+    else
+      [type_mapping[1], is_array]
+    end
   end
 
   def parse_indexes(table, table_indexes)
@@ -123,6 +131,15 @@ class Convergence::Dumper::PostgresSchemaDumper
           options = { primary_key: true }.merge(table.columns[column].options)
           table.columns[column].options = options
         end
+      when 'FOREIGN KEY'
+        to_table = indexes.first['referenced_table_name']
+        to_columns = indexes.map { |v| v['referenced_column_name'] }
+        options = {
+          reference: to_table,
+          reference_column: to_columns,
+          name: index_name
+        }
+        table.foreign_key(columns, options)
       else
         fail NotImplementedError.new('Unknown index type')
       end
