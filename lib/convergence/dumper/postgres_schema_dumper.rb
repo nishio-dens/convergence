@@ -71,9 +71,9 @@ class Convergence::Dumper::PostgresSchemaDumper
 
   def parse_table_options(table, table_option)
     option = {}
-    option.merge!(collate: table_option['TABLE_COLLATION'])
-    option.merge!(comment: table_option['TABLE_COMMENT'])
-    option.merge!(auto_increment: table_option['AUTO_INCREMENT']) if table_option['AUTO_INCREMENT']
+    option.merge!(collate: table_option['table_collation']) if table_option['table_collation']
+    option.merge!(comment: table_option['table_comment']) if table_option['table_comment']
+    option.merge!(auto_increment: table_option['auto_increment']) if table_option['auto_increment']
     table.table_options = option
   end
 
@@ -88,9 +88,17 @@ class Convergence::Dumper::PostgresSchemaDumper
     data_type = to_convergence_type(column['udt_name'])
     column_name = column['column_name']
     options = { null: column['is_nullable'] == 'YES' ? true : false }
-    options.merge!(default: column['column_default']) unless column['column_default'].nil?
+    unless column['column_default'].nil?
+      if column['column_default'] == 'NULL::character varying'
+        # Nothing
+      else
+        default_value = column['column_default']
+          .gsub(/::character varying$/, "")
+          .gsub(/^''$/, "")
+        options.merge!(default: default_value)
+      end
+    end
     options.merge!(character_set: column['character_set_name']) unless column['character_set_name'].nil?
-    options.merge!(collate: column['column_name']) unless column['column_name'].nil?
     column_type = column['column_type']
     # FIXME: Support precision
     # FIXME: Support Column Comment
