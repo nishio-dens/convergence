@@ -33,6 +33,12 @@ class Convergence::Column
     double
     decimal
   )
+  POSTGRES_COLUMN_MAPPINGS = [
+    # Postgres Type, Convergence Type
+    [:int4,          :int],
+    [:bool,          :boolean],
+    [:timestamp,     :datetime]
+  ]
 
   def initialize(type, column_name, options = {})
     @type = type
