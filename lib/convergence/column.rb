@@ -27,12 +27,21 @@ class Convergence::Column
     datetime
     timestamp
     year
+    json
+    inet
   )
   FLOATING_POINT_COLUMN_TYPE = %i(
     float
     double
     decimal
   )
+  POSTGRES_COLUMN_MAPPINGS = [
+    # Postgres Type, Convergence Type
+    [:int8,          :bigint],
+    [:int4,          :int],
+    [:bool,          :boolean],
+    [:timestamp,     :datetime]
+  ]
 
   def initialize(type, column_name, options = {})
     @type = type

@@ -18,6 +18,7 @@ opts = Slop.parse(help: true) do |opt|
   opt.on 'i=', 'input=', 'Input DSL'
   opt.on 'dryrun'
   opt.on 'apply', 'execute sql to your database'
+  opt.on 'debug', 'debug mode'
 end
 
 Convergence::Command.new(opts).execute
