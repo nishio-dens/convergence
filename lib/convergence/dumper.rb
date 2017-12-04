@@ -31,7 +31,11 @@ class Convergence::Dumper
     case [column.type, column.options[:limit]]
     when [:tinyint, '1']
       column_type = "boolean"
-      argument << column.options.reject { |k, _| k == :limit }.map { |k, v| key_value_text(k, v) }
+      options = column.options.dup
+      options.delete(:limit)
+      options = options.merge(default: false) if options[:default] == "0"
+      options = options.merge(default: true) if options[:default] == "1"
+      argument << options.map { |k, v| key_value_text(k, v) }
     else
       column_type = column.type
       argument << column.options.map { |k, v| key_value_text(k, v) }
