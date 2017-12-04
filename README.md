@@ -1,12 +1,13 @@
 # Convergence
 
-Convergence is a Database Schema management tools.
+Convergence is a pure-Ruby database schema migration tool.
 Currently, This tools is support only MySQL.
 
 It defines DB Schema using Convergence DSL(like Rails DSL).
 For more information about Convergence DSL, See below 'Detail About Convergence DSL'.
 
 
+[![Gem Version](https://badge.fury.io/rb/convergence.svg)](https://badge.fury.io/rb/convergence)
 [![Build Status](https://travis-ci.org/nishio-dens/convergence.svg?branch=master)](https://travis-ci.org/nishio-dens/convergence)
 
 ## Installation
