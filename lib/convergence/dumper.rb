@@ -42,7 +42,7 @@ class Convergence::Dumper
   def dump_foreign_key(foreign_key)
     columns = single_or_multiple_symbol(foreign_key.from_columns)
     argument = [columns]
-    argument << [key_value_text('reference', foreign_key.to_table)]
+    argument << [key_value_symbol('reference', foreign_key.to_table)]
     argument << ["reference_column: #{single_or_multiple_symbol(foreign_key.to_columns)}"]
     argument << foreign_key.options.map { |k, v| key_value_text(k, v) }
     "t.foreign_key #{argument.flatten.join(', ')}"
@@ -64,5 +64,9 @@ class Convergence::Dumper
               %(#{v.inspect})
             end
     "#{k}: #{value}"
+  end
+
+  def key_value_symbol(k, v)
+    "#{k}: :#{v}"
   end
 end
