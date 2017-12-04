@@ -12,12 +12,12 @@ describe Convergence::Dumper do
   end
   let(:table1_dsl) do
     dsl = <<-DSL
-create_table "dummy_table", engine: "MyISAM" do |t|
-  t.int "id", limit: 11
-  t.varchar "name", limit: 100, null: true, comment: "name"
+create_table :dummy_table, engine: "MyISAM" do |t|
+  t.int :id, limit: 11
+  t.varchar :name, limit: 100, null: true, comment: "name"
 
-  t.index "name", name: "idx_name"
-  t.foreign_key "id", reference: "dummy_ref", reference_column: "id", name: "dummy_table_id_fk"
+  t.index :name, name: "idx_name"
+  t.foreign_key :id, reference: :dummy_ref, reference_column: :id, name: "dummy_table_id_fk"
 end
   DSL
     dsl.strip
