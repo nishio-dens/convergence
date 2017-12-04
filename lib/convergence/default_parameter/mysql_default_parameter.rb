@@ -120,7 +120,7 @@ class Convergence::DefaultParameter::MysqlDefaultParameter
   def remove_index_default_parameter(table)
     table.indexes.each do |_, va|
       va.options.each do |k, v|
-        if !DEFAULT_INDEX_PARAMETERS[k].nil? && DEFAULT_INDEX_PARAMETERS[k].downcase == v.to_s.downcase
+        if !DEFAULT_INDEX_PARAMETERS[k].nil? && DEFAULT_INDEX_PARAMETERS[k].to_s.downcase == v.to_s.downcase
           va.options.delete(k)
         end
       end
