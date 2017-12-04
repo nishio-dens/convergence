@@ -28,8 +28,20 @@ class Convergence::Dumper
 
   def dump_column(column)
     argument = [%(:#{column.column_name})]
-    argument << column.options.map { |k, v| key_value_text(k, v) }
-    "t.#{column.type} #{argument.flatten.join(', ')}"
+    case [column.type, column.options[:limit]]
+    when [:tinyint, '1']
+      column_type = "boolean"
+      options = column.options.dup
+      options.delete(:limit)
+      options = options.merge(default: false) if options[:default] == "0"
+      options = options.merge(default: true) if options[:default] == "1"
+      argument << options.map { |k, v| key_value_text(k, v) }
+    else
+      column_type = column.type
+      argument << column.options.map { |k, v| key_value_text(k, v) }
+    end
+
+    "t.#{column_type} #{argument.flatten.join(', ')}"
   end
 
   def dump_index(index)
