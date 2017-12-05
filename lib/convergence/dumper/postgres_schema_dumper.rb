@@ -31,7 +31,7 @@ class Convergence::Dumper::PostgresSchemaDumper
       SELECT
         *
       FROM
-        information_schema.TABLES TABLES
+        INFORMATION_SCHEMA.TABLES TABLES
       WHERE
         TABLE_SCHEMA = '#{postgres.escape(schema)}'
       ORDER BY
@@ -41,7 +41,7 @@ class Convergence::Dumper::PostgresSchemaDumper
 
   def select_column_definitions(schema)
     postgres.exec("
-      SELECT * FROM information_schema.COLUMNS
+      SELECT * FROM INFORMATION_SCHEMA.COLUMNS
       WHERE TABLE_SCHEMA = '#{postgres.escape(schema)}'
       ORDER BY TABLE_NAME, ORDINAL_POSITION
     ")
@@ -50,16 +50,22 @@ class Convergence::Dumper::PostgresSchemaDumper
   def select_index_definitions(schema)
     # FIXME: support all indexes
     #    subpart, foreign_key, unique/non_unique etc...
-    postgres.exec("
+    foreign_key_query = <<-EOS
       SELECT
-        DISTINCT TC.TABLE_NAME, KCU.COLUMN_NAME, NULL AS SUB_PART, NULL AS NON_UNIQUE, TC.CONSTRAINT_NAME AS INDEX_NAME,
-        KCU.ORDINAL_POSITION AS SEQ_IN_INDEX, TC.CONSTRAINT_TYPE AS INDEX_TYPE,
+        DISTINCT TC.TABLE_NAME,
+        KCU.COLUMN_NAME,
+        NULL AS SUB_PART,
+        FALSE AS NON_UNIQUE,
+        TC.CONSTRAINT_NAME AS INDEX_NAME,
+        KCU.ORDINAL_POSITION AS SEQ_IN_INDEX,
+        TC.CONSTRAINT_TYPE AS INDEX_TYPE,
         TC.CONSTRAINT_TYPE,
-        '' AS REFERENCED_TABLE_NAME, '' AS REFERENCED_COLUMN_NAME
+        '' AS REFERENCED_TABLE_NAME,
+        '' AS REFERENCED_COLUMN_NAME
       FROM
-        information_schema.TABLE_CONSTRAINTS TC
+        INFORMATION_SCHEMA.TABLE_CONSTRAINTS TC
       LEFT OUTER JOIN
-        information_schema.KEY_COLUMN_USAGE KCU
+        INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU
       ON
         KCU.CONSTRAINT_SCHEMA = '#{postgres.escape(schema)}'
         AND TC.TABLE_NAME = KCU.TABLE_NAME
@@ -67,7 +73,45 @@ class Convergence::Dumper::PostgresSchemaDumper
       WHERE
         TC.TABLE_SCHEMA = 'public'
         AND TC.CONSTRAINT_TYPE != 'CHECK'
-    ")
+    EOS
+    index_query = <<-EOS
+    SELECT
+      IDXS.TABLENAME AS TABLE_NAME,
+      C.COLUMN_NAME,
+      NULL AS SUB_PART,
+      (NOT IDX.INDISUNIQUE) AS NON_UNIQUE,
+      IDXS.INDEXNAME AS INDEX_NAME,
+      IDX.SEQ_IN_INDEX,
+      'XXX_FIXME_BTREE' AS INDEX_TYPE,
+      'INDEX' AS CONSTRAINT_TYPE,
+      NULL AS REFERENCED_TABLE_NAME,
+      NULL AS REFERENCED_COLUMN_NAME
+    FROM
+      PG_INDEXES AS IDXS
+    INNER JOIN
+      INFORMATION_SCHEMA.COLUMNS C
+    ON
+      C.TABLE_NAME = IDXS.TABLENAME
+    INNER JOIN
+      (
+        SELECT
+          INDEXRELID,
+          INDISUNIQUE,
+          UNNEST(INDKEY) AS INDKEY,
+          GENERATE_SUBSCRIPTS(IDX.INDKEY, 1) AS SEQ_IN_INDEX
+        FROM
+          PG_INDEX IDX
+       ) IDX
+    ON
+      IDXS.INDEXNAME::regclass = IDX.INDEXRELID
+    WHERE
+      IDXS.SCHEMANAME = 'public'
+      AND C.TABLE_SCHEMA = 'public'
+      AND C.ORDINAL_POSITION = IDX.INDKEY
+      AND IDXS.INDEXNAME NOT LIKE '%pg_toast_%'
+    EOS
+
+    postgres.exec("#{foreign_key_query} UNION ALL #{index_query}")
   end
 
   def parse_table_options(table, table_option)
@@ -124,7 +168,6 @@ class Convergence::Dumper::PostgresSchemaDumper
 
   def parse_indexes(table, table_indexes)
     return if table_indexes.nil?
-
     table_indexes.group_by { |r| r['index_name'] }.each do |index_name, indexes|
       type = indexes.first['constraint_type']
       columns = indexes.map { |v| v['column_name'] }
