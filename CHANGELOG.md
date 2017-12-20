@@ -8,6 +8,10 @@
 
   *yujideveloper*
 
+* Change requires ruby version (>= 2.3.0)
+
+  *yujideveloper*
+
 ## Convergence 0.2.4 (December 20, 2017) ##
 
 * Bug Fix default: "" to default: nil does not work fine
