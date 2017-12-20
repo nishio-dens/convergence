@@ -17,10 +17,12 @@ class Convergence::Command::Diff < Convergence::Command
   private
 
   def from_tables
-    Convergence::DSL.parse(File.open(@opts[:diff][0]).read)
+    current_dir_path = Pathname.new(@opts[:diff][0]).realpath.dirname
+    Convergence::DSL.parse(File.open(@opts[:diff][0]).read, current_dir_path)
   end
 
   def to_tables
-    Convergence::DSL.parse(File.open(@opts[:diff][1]).read)
+    current_dir_path = Pathname.new(@opts[:diff][1]).realpath.dirname
+    Convergence::DSL.parse(File.open(@opts[:diff][1]).read, current_dir_path)
   end
 end
