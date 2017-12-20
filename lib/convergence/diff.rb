@@ -84,7 +84,7 @@ class Convergence::Diff
           from_column_option_with_type = from_column
             .options
             .merge(type: from_column.type)
-            .map { |k, v| [k, case_sensitive_column?(k) ? v&.to_s : v&.to_s.downcase] }
+            .map { |k, v| [k, case_sensitive_column?(k) ? v&.to_s : v&.to_s&.downcase] }
             .to_a
           { column_name => Hash[(to_column_option_with_type - from_column_option_with_type)] }
         end
