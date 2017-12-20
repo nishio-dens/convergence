@@ -1,3 +1,13 @@
+## Convergence 0.2.5 (December 21, 2017) ##
+
+* Bug Fix Diff option does not work fine (PR: #50)
+
+  *yujideveloper*
+
+* Bug Fix NoMethodError (PR: #51)
+
+  *yujideveloper*
+
 ## Convergence 0.2.4 (December 20, 2017) ##
 
 * Bug Fix default: "" to default: nil does not work fine
