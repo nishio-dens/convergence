@@ -1,4 +1,4 @@
-Copyright (c) 2014 Shinsuke Nishio
+Copyright (c) 2014-2018 Shinsuke Nishio
 
 MIT License
 

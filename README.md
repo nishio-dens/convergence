@@ -315,4 +315,4 @@ $ bundle exec rspec
 
 ## Copyright
 
-Copyright © 2017 S.nishio. See LICENSE.txt for further details.
+Copyright © 2014-2018 S.nishio. See LICENSE.txt for further details.
