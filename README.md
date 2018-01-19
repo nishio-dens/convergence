@@ -55,8 +55,6 @@ end
 
 $ convergence -c database.yml -i example.schema --dryrun
 
-#
-#
 # CREATE TABLE `test_tables` (
 #   `id` int(11) NOT NULL AUTO_INCREMENT,
 #   `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
@@ -69,7 +67,7 @@ $ convergence -c database.yml -i example.schema --dryrun
 $ convergence -c database.yml -i example.schema --apply
 
 SET FOREIGN_KEY_CHECKS=0;
-  --> 0.000794s
+  --> 0.0005826340056955814s
 CREATE TABLE `test_tables` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
@@ -78,9 +76,9 @@ CREATE TABLE `test_tables` (
   PRIMARY KEY (`id`),
   KEY `index_test_tables_on_name` (`name`)
 ) ENGINE=InnoDB ROW_FORMAT=Compact DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
-  --> 0.01485s
+  --> 0.017457014000683557s
 SET FOREIGN_KEY_CHECKS=1;
-  --> 0.000115s
+  --> 0.00019878800230799243s
 
 $ cat changed_example.schema
 
@@ -93,24 +91,29 @@ end
 
 $ convergence -c database.yml -i changed_example.schema  --dryrun
 
-# ALTER TABLE `test_tables` DROP COLUMN `updated_at`;
-# ALTER TABLE `test_tables` ADD COLUMN `posted_at` datetime NOT NULL AFTER `created_at`;
 # DROP INDEX `index_test_tables_on_name` ON `test_tables`;
+# ALTER TABLE `test_tables`
+#   DROP COLUMN `updated_at`;
+# ALTER TABLE `test_tables`
+#   ADD COLUMN `posted_at` datetime NOT NULL AFTER `created_at`;
 # ALTER TABLE `test_tables` ENGINE=MyISAM COMMENT='Table Comment Test';
 
 $ convergence -c database.yml -i changed_example.schema  --apply
+
 SET FOREIGN_KEY_CHECKS=0;
-  --> 0.000847s
-ALTER TABLE `test_tables` DROP COLUMN `updated_at`;
-  --> 0.034026s
-ALTER TABLE `test_tables` ADD COLUMN `posted_at` datetime NOT NULL AFTER `created_at`;
-  --> 0.025328s
+  --> 0.0005331430002115667s
 DROP INDEX `index_test_tables_on_name` ON `test_tables`;
-  --> 0.011465s
+  --> 0.010850776998267975s
+ALTER TABLE `test_tables`
+  DROP COLUMN `updated_at`;
+  --> 0.025050114003533963s
+ALTER TABLE `test_tables`
+  ADD COLUMN `posted_at` datetime NOT NULL AFTER `created_at`;
+  --> 0.02903763700305717s
 ALTER TABLE `test_tables` ENGINE=MyISAM COMMENT='Table Comment Test';
-  --> 0.01115s
+  --> 0.022911186999408528s
 SET FOREIGN_KEY_CHECKS=1;
-  --> 0.000147s
+  --> 0.003360001996043138s
 
 $ mysql -u root example_database -e 'show create table test_tables\G'
 

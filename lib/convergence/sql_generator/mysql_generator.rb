@@ -15,9 +15,9 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
     @original_table = original_table
     sqls = []
     sqls << change_table_sql(to_table, delta)
-    sqls << ['']
     sqls << drop_table_sqls(delta)
     sqls << create_table_sqls(delta)
+    sqls.reject!(&:empty?)
     sqls.join("\n")
   end
 
@@ -53,6 +53,7 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
         results << alter_change_table_sql(table_name, table_delta[:change_table_option])
       end
     end
+    results << '' unless results.empty?
     results
   end
 
