@@ -19,7 +19,9 @@ class Convergence::Command
       elsif @opts[:apply]
         Convergence::Command::Apply
       end
-    unless execute_klass.nil?
+    if execute_klass.nil?
+      puts @opts
+    else
       execute_klass.new(@opts, config: @config).execute
     end
   end
