@@ -36,5 +36,35 @@ end
       dsl = Convergence::Dumper.new.dump_table_dsl(table1)
       expect(dsl).to eq(table1_dsl)
     end
+
+    context "when MySQL identifiers that require quotes in Ruby symbol syntax" do
+      let(:table1) do
+        Convergence::Table.new('dummy-table', engine: 'MyISAM').tap do |t|
+          t.int :id, limit: 11
+          t.varchar :"column-1", limit: 100, null: true, comment: 'column 1'
+
+          t.index :"column-1", name: 'idx_column-1'
+          t.foreign_key :"column-1", reference: 'dummy-ref', reference_column: :"dummy-column"
+        end
+      end
+
+      let(:table1_dsl) do
+        dsl = <<-DSL
+create_table :"dummy-table", engine: "MyISAM" do |t|
+  t.int :id, limit: 11
+  t.varchar :"column-1", limit: 100, null: true, comment: "column 1"
+
+  t.index :"column-1", name: "idx_column-1"
+  t.foreign_key :"column-1", reference: :"dummy-ref", reference_column: :"dummy-column", name: "dummy-table_column-1_fk"
+end
+      DSL
+        dsl.strip
+      end
+
+      it 'should be able to dump dsl' do
+        dsl = Convergence::Dumper.new.dump_table_dsl(table1)
+        expect(dsl).to eq(table1_dsl)
+      end
+    end
   end
 end
