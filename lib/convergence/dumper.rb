@@ -6,7 +6,7 @@ class Convergence::Dumper
   end
 
   def dump_table_dsl(table)
-    table_argument = [":#{table.table_name}"]
+    table_argument = [table.table_name.to_sym.inspect]
     table_argument << table.table_options.map { |k, v| key_value_text(k, v) }
     dsl = "create_table #{table_argument.flatten.join(', ')} do |t|\n"
     dsl += "  #{table.columns.map { |_, column| dump_column(column) }.join("\n  ")}"
@@ -27,7 +27,7 @@ class Convergence::Dumper
   private
 
   def dump_column(column)
-    argument = [%(:#{column.column_name})]
+    argument = [column.column_name.to_sym.inspect]
     case [column.type, column.options[:limit]]
     when [:tinyint, '1']
       column_type = "boolean"
@@ -63,9 +63,9 @@ class Convergence::Dumper
   def single_or_multiple_symbol(values)
     values_array = [values].flatten
     if values_array.size == 1
-      ":#{values_array.first}"
+      values_array.first.to_sym.inspect
     else
-      %(#{values.map(&:to_sym)})
+      values.map(&:to_sym).inspect
     end
   end
 
@@ -79,6 +79,6 @@ class Convergence::Dumper
   end
 
   def key_value_symbol(k, v)
-    "#{k}: :#{v}"
+    "#{k}: #{v.to_sym.inspect}"
   end
 end
