@@ -1,3 +1,17 @@
+## Convergence 0.2.6 (March 4, 2018) ##
+
+* Improve dryrun output (PR: #55)
+
+  *yujideveloper*
+
+* Support MySQL identifiers that require quotes in Ruby symbol syntax on export dsl (PR: #56)
+
+  *yujideveloper*
+
+* Output help message when executed without option (PR: #57)
+
+  *yujideveloper*
+
 ## Convergence 0.2.5 (December 21, 2017) ##
 
 * Bug Fix Diff option does not work fine (PR: #50)
