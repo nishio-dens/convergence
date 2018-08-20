@@ -1,3 +1,9 @@
+## Convergence 0.2.7 (August 20, 2018) ##
+
+* Fix issues of Convergence::Config (PR: #58)
+
+  *yujideveloper*
+
 ## Convergence 0.2.6 (March 4, 2018) ##
 
 * Improve dryrun output (PR: #55)
