@@ -2,11 +2,15 @@ require 'erb'
 require 'yaml'
 
 class Convergence::Config
-  attr_accessor :adapter, :database, :host, :port, :username, :password
+  ATTRIBUTES = %i[adapter database host port username password].freeze
+
+  attr_accessor(*ATTRIBUTES)
 
   def initialize(attributes)
     attributes.each do |k, v|
-      instance_variable_set("@#{k}", v) unless v.nil?
+      next if v.nil?
+      next if !ATTRIBUTES.include?(k.to_sym) && !ATTRIBUTES.include?(k.to_s)
+      instance_variable_set("@#{k}", v)
     end
   end
 
