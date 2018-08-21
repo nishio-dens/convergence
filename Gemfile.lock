@@ -91,7 +91,7 @@ DEPENDENCIES
   guard-rspec
   pry
   rake (~> 10.0)
-  rspec
+  rspec (>= 3.5)
   rubocop
 
 BUNDLED WITH
