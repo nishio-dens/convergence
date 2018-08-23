@@ -3,8 +3,8 @@ require 'pathname'
 
 class Convergence::Command::Apply < Convergence::Command
   def validate!
-    fail ArgumentError.new('--config required') if @config.nil?
-    fail ArgumentError.new('--input required') unless @opts[:input]
+    fail ArgumentError.new('config required') if @config.nil?
+    fail ArgumentError.new('input required') unless @opts[:input]
   end
 
   def execute

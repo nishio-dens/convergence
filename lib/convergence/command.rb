@@ -8,24 +8,6 @@ class Convergence::Command
     end
   end
 
-  def execute
-    execute_klass =
-      if @opts[:diff]
-        Convergence::Command::Diff
-      elsif @opts[:export]
-        Convergence::Command::Export
-      elsif @opts[:dryrun]
-        Convergence::Command::Dryrun
-      elsif @opts[:apply]
-        Convergence::Command::Apply
-      end
-    if execute_klass.nil?
-      puts @opts
-    else
-      execute_klass.new(@opts, config: @config).execute
-    end
-  end
-
   def database_adapter
     @config.nil? ? 'mysql' : @config.adapter
   end

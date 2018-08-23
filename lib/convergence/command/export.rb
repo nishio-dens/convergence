@@ -1,7 +1,7 @@
 class Convergence::Command::Export < Convergence::Command
   def validate!
     if @config.nil?
-      fail ArgumentError.new('--config required')
+      fail ArgumentError.new('config required')
     end
   end
 
