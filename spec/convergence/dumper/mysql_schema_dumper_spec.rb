@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'convergence/dumper/mysql_schema_dumper'
+require 'convergence/database_connector'
 
 describe Convergence::Dumper::MysqlSchemaDumper do
   before do

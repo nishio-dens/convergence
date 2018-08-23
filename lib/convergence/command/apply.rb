@@ -1,5 +1,9 @@
 require 'benchmark'
 require 'pathname'
+require 'convergence/command'
+require 'convergence/dsl'
+require 'convergence/default_parameter'
+require 'convergence/diff'
 
 class Convergence::Command::Apply < Convergence::Command
   def validate!

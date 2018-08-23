@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'convergence/dsl'
 
 describe Convergence::DSL do
   let(:dsl_single_table) do

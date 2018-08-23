@@ -1,3 +1,7 @@
+require 'convergence/column'
+require 'convergence/index'
+require 'convergence/foreign_key'
+
 class Convergence::Table
   attr_accessor :table_name, :table_options, :columns, :indexes, :foreign_keys
 

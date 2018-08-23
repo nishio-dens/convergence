@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'convergence/table'
 
 describe Convergence::Table do
   let(:table_name) { 'dummy_table' }

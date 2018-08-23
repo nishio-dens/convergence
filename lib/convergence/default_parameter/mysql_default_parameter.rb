@@ -1,3 +1,5 @@
+require 'convergence/default_parameter'
+
 class Convergence::DefaultParameter::MysqlDefaultParameter
   DEFAULT_TABLE_PARAMETERS = {
     engine: 'InnoDB',

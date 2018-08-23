@@ -1,3 +1,9 @@
+require 'pathname'
+require 'convergence/command'
+require 'convergence/default_parameter'
+require 'convergence/pretty_diff'
+require 'convergence/dsl'
+
 class Convergence::Command::Diff < Convergence::Command
   def validate!
     unless @opts[:diff].size == 2

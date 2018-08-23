@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'convergence/command/dryrun'
 
 describe 'Command::Dryrun#execute' do
   def execute(dsl_path)

@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
 require 'thor'
-require 'convergence/version'
+require 'convergence/module'
 require 'convergence/config'
-require 'convergence/command/apply'
-require 'convergence/command/diff'
-require 'convergence/command/dryrun'
-require 'convergence/command/export'
 
 class Convergence::CLI < Thor
   default_command :__fallback # TODO: `__fallback` will be removed in a future version(maybe v0.4.0)
@@ -19,14 +15,17 @@ class Convergence::CLI < Thor
   def apply(file)
     opts = { input: file }
     if options[:dry_run]
+      require 'convergence/command/dryrun'
       Convergence::Command::Dryrun.new(opts, config: config).execute
     else
+      require 'convergence/command/apply'
       Convergence::Command::Apply.new(opts, config: config).execute
     end
   end
 
   desc 'diff FILE1 FILE2', 'print diff of DSLs'
   def diff(file1, file2)
+    require 'convergence/command/diff'
     opts = { diff: [file1, file2] }
     Convergence::Command::Diff.new(opts, config: config).execute
   end
@@ -34,12 +33,14 @@ class Convergence::CLI < Thor
   desc 'export', 'export db schema to dsl'
   method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
   def export
+    require 'convergence/command/export'
     opts = {}
     Convergence::Command::Export.new(opts, config: config).execute
   end
 
   desc 'version', 'print the version'
   def version
+    require 'convergence/version'
     puts "version #{Convergence::VERSION}"
   end
 
@@ -65,15 +66,19 @@ class Convergence::CLI < Thor
   def __fallback
     command_klass =
       if !options[:diff].nil? && !options[:diff].empty?
+        require 'convergence/command/diff'
         opts = { diff: options[:diff] }
         Convergence::Command::Diff
       elsif options[:export]
+        require 'convergence/command/export'
         opts = {}
         Convergence::Command::Export
       elsif options[:dryrun]
+        require 'convergence/command/dryrun'
         opts = { input: options[:input] }
         Convergence::Command::Dryrun
       elsif options[:apply]
+        require 'convergence/command/apply'
         opts = { input: options[:input] }
         Convergence::Command::Apply
       end

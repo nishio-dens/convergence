@@ -3,6 +3,7 @@ require 'bundler/setup'
 require 'rspec'
 require 'pry'
 require 'convergence'
+require 'convergence/command'
 Dir["#{File.dirname(__FILE__)}/integrations/**/*.rb"].each { |f| require f }
 
 $default_output = File.open('/dev/null', 'w')

@@ -1,3 +1,7 @@
+require 'convergence/config'
+require 'convergence/logger'
+require 'convergence/database_connector'
+
 class Convergence::Command
   def initialize(opts, config: nil)
     @opts = opts
@@ -19,6 +23,7 @@ class Convergence::Command
   def dumper
     @dumper ||= case database_adapter
                 when 'mysql', 'mysql2'
+                  require 'convergence/dumper/mysql_schema_dumper'
                   Convergence::Dumper::MysqlSchemaDumper.new(connector)
                 else
                   fail NotImplementedError.new('unknown database adapter')
@@ -28,6 +33,7 @@ class Convergence::Command
   def sql_generator
     @sql_generator ||= case database_adapter
                        when 'mysql', 'mysql2'
+                         require 'convergence/sql_generator/mysql_generator'
                          SQLGenerator::MysqlGenerator.new
                        else
                          fail NotImplementedError.new('unknown database adapter')

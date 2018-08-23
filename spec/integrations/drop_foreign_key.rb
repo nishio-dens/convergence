@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'convergence/command/apply'
 
 describe 'Changeable Foreign key' do
   after(:each) do

@@ -1,4 +1,10 @@
 require 'pathname'
+require 'convergence/command'
+require 'convergence/command/apply'
+require 'convergence/dsl'
+require 'convergence/default_parameter'
+require 'convergence/pretty_diff'
+
 class Convergence::Command::Dryrun < Convergence::Command
   def validate!
     fail ArgumentError.new('config required') if @config.nil?

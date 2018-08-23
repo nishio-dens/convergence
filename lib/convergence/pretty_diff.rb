@@ -1,4 +1,6 @@
 require 'diffy'
+require 'convergence/diff'
+require 'convergence/dumper'
 
 class Convergence::PrettyDiff
   def initialize(from_tables, to_tables)

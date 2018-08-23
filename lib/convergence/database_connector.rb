@@ -5,6 +5,7 @@ class Convergence::DatabaseConnector
     @connector =
       case config.adapter
       when 'mysql', 'mysql2'
+        require 'convergence/database_connector/mysql_connector'
         Convergence::DatabaseConnector::MysqlConnector.new(config)
       else
         fail NotImplementedError.new("#{config.adapter} not supported yet")

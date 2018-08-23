@@ -1,3 +1,7 @@
+require 'convergence/command'
+require 'convergence/dumper'
+require 'convergence/default_parameter'
+
 class Convergence::Command::Export < Convergence::Command
   def validate!
     if @config.nil?
