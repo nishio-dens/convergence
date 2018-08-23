@@ -53,7 +53,7 @@ create_table 'test_tables' do |t|
   t.index :name
 end
 
-$ convergence dryrun example.schema -c database.yml
+$ convergence apply example.schema -c database.yml --dry-run
 
 # CREATE TABLE `test_tables` (
 #   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -89,7 +89,7 @@ create_table 'test_tables', comment: 'Table Comment Test', engine: 'MyISAM' do |
   t.datetime :posted_at
 end
 
-$ convergence dryrun changed_example.schema -c database.yml
+$ convergence apply changed_example.schema -c database.yml --dry-run
 
 # DROP INDEX `index_test_tables_on_name` ON `test_tables`;
 # ALTER TABLE `test_tables`
@@ -134,7 +134,6 @@ Create Table: CREATE TABLE `test_tables` (
 Commands:
   convergence apply FILE -c, --config=CONFIG   # execute sql to your database
   convergence diff FILE1 FILE2                 # print diff of DSLs
-  convergence dryrun FILE -c, --config=CONFIG  # dryrun for apply
   convergence export -c, --config=CONFIG       # export db schema to dsl
   convergence help [COMMAND]                   # Describe available commands or one specific command
   convergence version                          # print the version
@@ -191,10 +190,10 @@ create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author
 end
 ```
 
-### Dryrun
+### Dry run
 
 ```
-$ convergence dryrun example.schema -c database.yml
+$ convergence apply example.schema -c database.yml --dry-run
 ```
 
 ### Apply

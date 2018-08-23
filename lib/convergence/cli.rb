@@ -15,22 +15,20 @@ class Convergence::CLI < Thor
 
   desc 'apply FILE', 'execute sql to your database'
   method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
+  method_option :dry_run, type: :boolean
   def apply(file)
     opts = { input: file }
-    Convergence::Command::Apply.new(opts, config: config).execute
+    if options[:dry_run]
+      Convergence::Command::Dryrun.new(opts, config: config).execute
+    else
+      Convergence::Command::Apply.new(opts, config: config).execute
+    end
   end
 
   desc 'diff FILE1 FILE2', 'print diff of DSLs'
   def diff(file1, file2)
     opts = { diff: [file1, file2] }
     Convergence::Command::Diff.new(opts, config: config).execute
-  end
-
-  desc 'dryrun FILE', 'dryrun for apply'
-  method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
-  def dryrun(file)
-    opts = { input: file }
-    Convergence::Command::Dryrun.new(opts, config: config).execute
   end
 
   desc 'export', 'export db schema to dsl'
