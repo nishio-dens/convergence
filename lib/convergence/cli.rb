@@ -99,6 +99,6 @@ class Convergence::CLI < Thor
   end
 
   def deprecation_warning
-    warn '[DEPRECATION] Option style is deprecated. Please use subscommand style.'
+    warn '[DEPRECATION] Flag style command is deprecated. Please use sub-command style instead.'
   end
 end
