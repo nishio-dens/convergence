@@ -1,3 +1,17 @@
+## Convergence 1.0.0 (August 28, 2018) ##
+
+* [BREAKING CHANGE] Change flag style command to sub-command style (PR: #60)
+
+  A flag style command has been deprecated
+
+      e.g. convergence -c database.yml -i example.schema --apply
+
+  Introduce a sub command style.
+
+      e.g. convergence apply example.schema -c database.yml
+
+  *yujideveloper*
+
 ## Convergence 0.2.7 (August 20, 2018) ##
 
 * Fix issues of Convergence::Config (PR: #58)
