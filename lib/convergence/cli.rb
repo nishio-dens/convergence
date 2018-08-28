@@ -5,7 +5,7 @@ require 'convergence/module'
 require 'convergence/config'
 
 class Convergence::CLI < Thor
-  default_command :__fallback # TODO: `__fallback` will be removed in a future version(maybe v0.4.0)
+  default_command :__fallback # TODO: `__fallback` will be removed in a future version(maybe v1.1.0)
  
   map %w[--version -v] => :version
 
@@ -44,7 +44,7 @@ class Convergence::CLI < Thor
     puts "version #{Convergence::VERSION}"
   end
 
-  # TODO: `__fallback` will be removed in a future version(maybe v0.4.0)
+  # TODO: `__fallback` will be removed in a future version(maybe v1.1.0)
   desc '', '', hide: true
   method_option :config,
                 aliases: '-c', type: :string,
