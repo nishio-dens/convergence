@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'convergence/dumper'
+require 'convergence/table'
 
 describe Convergence::Dumper do
   let(:table1) do

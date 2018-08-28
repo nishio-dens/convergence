@@ -1,3 +1,5 @@
+require 'convergence/table'
+
 class Convergence::DSL
   attr_accessor :tables, :current_dir_path
 

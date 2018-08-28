@@ -1,3 +1,5 @@
+require 'convergence/sql_generator'
+
 class SQLGenerator::MysqlGenerator < SQLGenerator
   OPTION_MAPPING = {
     engine: 'ENGINE',

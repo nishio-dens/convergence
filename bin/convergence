@@ -1,23 +1,6 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'rubygems'
-require 'convergence'
-require 'slop'
+require 'convergence/cli'
 
-opts = Slop.parse(help: true) do |opt|
-  opt.banner 'Usage: convergence [options]'
-
-  opt.on 'v', 'version' do
-    puts "version #{Convergence::VERSION}"
-    exit
-  end
-
-  opt.on 'c=', 'config=', 'Database Yaml Setting'
-  opt.on 'd=', 'diff=', 'DSL1,DSL2', as: Array, limit: 2
-  opt.on 'e', 'export', 'export db schema to dsl'
-  opt.on 'i=', 'input=', 'Input DSL'
-  opt.on 'dryrun'
-  opt.on 'apply', 'execute sql to your database'
-end
-
-Convergence::Command.new(opts).execute
+Convergence::CLI.start

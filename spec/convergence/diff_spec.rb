@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'convergence/diff'
+require 'convergence/table'
 
 describe Convergence::DSL do
   describe '#diff' do

@@ -53,7 +53,7 @@ create_table 'test_tables' do |t|
   t.index :name
 end
 
-$ convergence -c database.yml -i example.schema --dryrun
+$ convergence apply example.schema -c database.yml --dry-run
 
 # CREATE TABLE `test_tables` (
 #   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -64,7 +64,7 @@ $ convergence -c database.yml -i example.schema --dryrun
 #   KEY `index_test_tables_on_name` (`name`)
 # ) ENGINE=InnoDB ROW_FORMAT=Compact DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
 
-$ convergence -c database.yml -i example.schema --apply
+$ convergence apply example.schema -c database.yml
 
 SET FOREIGN_KEY_CHECKS=0;
   --> 0.0005826340056955814s
@@ -89,7 +89,7 @@ create_table 'test_tables', comment: 'Table Comment Test', engine: 'MyISAM' do |
   t.datetime :posted_at
 end
 
-$ convergence -c database.yml -i changed_example.schema  --dryrun
+$ convergence apply changed_example.schema -c database.yml --dry-run
 
 # DROP INDEX `index_test_tables_on_name` ON `test_tables`;
 # ALTER TABLE `test_tables`
@@ -98,7 +98,7 @@ $ convergence -c database.yml -i changed_example.schema  --dryrun
 #   ADD COLUMN `posted_at` datetime NOT NULL AFTER `created_at`;
 # ALTER TABLE `test_tables` ENGINE=MyISAM COMMENT='Table Comment Test';
 
-$ convergence -c database.yml -i changed_example.schema  --apply
+$ convergence apply changed_example.schema -c database.yml
 
 SET FOREIGN_KEY_CHECKS=0;
   --> 0.0005331430002115667s
@@ -131,15 +131,12 @@ Create Table: CREATE TABLE `test_tables` (
 ## Usage
 
 ```
-Usage: convergence [options]
-    -v, --version
-    -c, --config       Database Yaml Setting
-    -d, --diff         DSL1,DSL2
-    -e, --export       export db schema to dsl
-    -i, --input        Input DSL
-        --dryrun
-        --apply        execute sql to your database
-    -h, --help         Display this help message.
+Commands:
+  convergence apply FILE -c, --config=CONFIG   # execute sql to your database
+  convergence diff FILE1 FILE2                 # print diff of DSLs
+  convergence export -c, --config=CONFIG       # export db schema to dsl
+  convergence help [COMMAND]                   # Describe available commands or one specific command
+  convergence version                          # print the version
 ```
 
 ### DB Config
@@ -161,7 +158,7 @@ First, you need to create database.yml.
 And then, execute command like below.
 
 ```
-$ convergence -c database.yml --export > example.schema
+$ convergence export -c database.yml > example.schema
 ```
 
 Export DSL like this.
@@ -193,16 +190,16 @@ create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author
 end
 ```
 
-### Dryrun
+### Dry run
 
 ```
-$ convergence -c database.yml -i example.schema --dryrun
+$ convergence apply example.schema -c database.yml --dry-run
 ```
 
 ### Apply
 
 ```
-$ convergence -c database.yml -i example.schema --apply
+$ convergence apply example.schema -c database.yml
 ```
 
 ### Include Other Schema files

@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'convergence/command/apply'
 
 describe 'Changeable Foreign key' do
   after(:each) do
@@ -7,10 +8,9 @@ describe 'Changeable Foreign key' do
 
   def execute(dsl_path)
     parse_option = {
-      apply: true,
       input: File.expand_path("#{File.dirname(__FILE__)}/../fixtures/#{dsl_path}")
     }
-    Convergence::Command.new(parse_option, config: mysql_settings).execute
+    Convergence::Command::Apply.new(parse_option, config: mysql_settings).execute
   end
 
   describe 'drop foreign key' do

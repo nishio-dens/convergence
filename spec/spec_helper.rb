@@ -3,6 +3,7 @@ require 'bundler/setup'
 require 'rspec'
 require 'pry'
 require 'convergence'
+require 'convergence/database_connector'
 Dir["#{File.dirname(__FILE__)}/integrations/**/*.rb"].each { |f| require f }
 
 $default_output = File.open('/dev/null', 'w')
@@ -20,8 +21,7 @@ def rollback
     .map(&:strip)
     .reject(&:empty?)
   sqls.each do |sql|
-    Convergence::Command.new({}, config: mysql_settings)
-      .connector
+    Convergence::DatabaseConnector.new(mysql_settings)
       .client
       .query("#{sql};")
   end
