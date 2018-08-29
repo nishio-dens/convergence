@@ -41,7 +41,7 @@ class Convergence::Command::Dryrun < Convergence::Command
       .split("\n")
       .map { |v| '# ' + v }
       .join("\n")
-    logger.output(msg)
+    logger.output(msg) unless msg.empty?
     msg
   end
 end
