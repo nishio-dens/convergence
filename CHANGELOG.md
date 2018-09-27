@@ -1,3 +1,9 @@
+## Convergence 1.0.1 (September 27, 2018) ##
+
+* Add Rollback Dryrun command (PR: #64)
+
+  *nishio-dens*
+
 ## Convergence 1.0.0 (August 28, 2018) ##
 
 * [BREAKING CHANGE] Change flag style command to sub-command style (PR: #60)

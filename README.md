@@ -196,6 +196,13 @@ end
 $ convergence apply example.schema -c database.yml --dry-run
 ```
 
+### Rollback Dry run
+
+```
+$ convergence apply example.schema -c database.yml --rollback-dry-run
+```
+
+
 ### Apply
 
 ```
