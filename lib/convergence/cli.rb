@@ -6,17 +6,21 @@ require 'convergence/config'
 
 class Convergence::CLI < Thor
   default_command :__fallback # TODO: `__fallback` will be removed in a future version(maybe v1.1.0)
- 
+
   map %w[--version -v] => :version
 
   desc 'apply FILE', 'execute sql to your database'
   method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
   method_option :dry_run, type: :boolean
+  method_option :rollback_dry_run, type: :boolean
   def apply(file)
     opts = { input: file }
     if options[:dry_run]
       require 'convergence/command/dryrun'
       Convergence::Command::Dryrun.new(opts, config: config).execute
+    elsif options[:rollback_dry_run]
+      require 'convergence/command/rollback_dryrun'
+      Convergence::Command::RollbackDryrun.new(opts, config: config).execute
     else
       require 'convergence/command/apply'
       Convergence::Command::Apply.new(opts, config: config).execute
