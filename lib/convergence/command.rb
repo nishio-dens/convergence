@@ -12,6 +12,8 @@ class Convergence::Command
     end
   end
 
+  private
+
   def database_adapter
     @config.nil? ? 'mysql' : @config.adapter
   end
