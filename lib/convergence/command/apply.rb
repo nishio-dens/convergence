@@ -24,6 +24,16 @@ class Convergence::Command::Apply < Convergence::Command
 
   private
 
+  def sql_generator
+    @sql_generator ||= case database_adapter
+                       when 'mysql', 'mysql2'
+                         require 'convergence/sql_generator/mysql_generator'
+                         SQLGenerator::MysqlGenerator.new
+                       else
+                         fail NotImplementedError.new('unknown database adapter')
+                       end
+  end
+
   def execute_sql(input_tables, current_tables)
     sql = generate_sql(input_tables, current_tables)
     unless sql.strip.empty?
