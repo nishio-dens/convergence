@@ -15,6 +15,8 @@ class Convergence::Command::Dryrun < Convergence::Command
     output_sql(input_tables, current_tables)
   end
 
+  private
+
   def output_diff(input_tables, current_tables)
     input_tables_without_default_parameter =
       Convergence::DefaultParameter.remove_database_default_parameter(input_tables, database_adapter)

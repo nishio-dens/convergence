@@ -12,6 +12,8 @@ class Convergence::Command
     end
   end
 
+  private
+
   def database_adapter
     @config.nil? ? 'mysql' : @config.adapter
   end
@@ -28,16 +30,6 @@ class Convergence::Command
                 else
                   fail NotImplementedError.new('unknown database adapter')
                 end
-  end
-
-  def sql_generator
-    @sql_generator ||= case database_adapter
-                       when 'mysql', 'mysql2'
-                         require 'convergence/sql_generator/mysql_generator'
-                         SQLGenerator::MysqlGenerator.new
-                       else
-                         fail NotImplementedError.new('unknown database adapter')
-                       end
   end
 
   def logger

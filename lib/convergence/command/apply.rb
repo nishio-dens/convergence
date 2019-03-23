@@ -13,6 +13,27 @@ class Convergence::Command::Apply < Convergence::Command
     execute_sql(input_tables, current_tables)
   end
 
+  def generate_sql(input_tables, current_tables)
+    current_tables_with_full_option =
+      Convergence::DefaultParameter.append_database_default_parameter(current_tables, database_adapter)
+    input_tables_with_full_option =
+      Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
+    delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
+    sql_generator.generate(input_tables_with_full_option, delta, current_tables_with_full_option)
+  end
+
+  private
+
+  def sql_generator
+    @sql_generator ||= case database_adapter
+                       when 'mysql', 'mysql2'
+                         require 'convergence/sql_generator/mysql_generator'
+                         SQLGenerator::MysqlGenerator.new
+                       else
+                         fail NotImplementedError.new('unknown database adapter')
+                       end
+  end
+
   def execute_sql(input_tables, current_tables)
     sql = generate_sql(input_tables, current_tables)
     unless sql.strip.empty?
@@ -38,14 +59,5 @@ SET FOREIGN_KEY_CHECKS=1;
         end
       end
     end
-  end
-
-  def generate_sql(input_tables, current_tables)
-    current_tables_with_full_option =
-      Convergence::DefaultParameter.append_database_default_parameter(current_tables, database_adapter)
-    input_tables_with_full_option =
-      Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
-    delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
-    sql_generator.generate(input_tables_with_full_option, delta, current_tables_with_full_option)
   end
 end

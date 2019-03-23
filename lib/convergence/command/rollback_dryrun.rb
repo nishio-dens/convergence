@@ -13,6 +13,8 @@ class Convergence::Command::RollbackDryrun < Convergence::Command
     output_sql(current_tables, input_tables)
   end
 
+  private
+
   def output_sql(input_tables, current_tables)
     msg = Convergence::Command::Apply
       .new(@opts, config: @config)
