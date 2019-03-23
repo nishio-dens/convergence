@@ -6,13 +6,7 @@ require 'convergence/default_parameter'
 require 'convergence/pretty_diff'
 
 class Convergence::Command::Dryrun < Convergence::Command
-  def validate!
-    fail ArgumentError.new('config required') if @config.nil?
-    fail ArgumentError.new('input required') unless @opts[:input]
-  end
-
   def execute
-    validate!
     current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
     input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
     current_tables = dumper.dump
