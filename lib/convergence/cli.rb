@@ -5,8 +5,6 @@ require 'convergence/module'
 require 'convergence/config'
 
 class Convergence::CLI < Thor
-  default_command :__fallback # TODO: `__fallback` will be removed in a future version(maybe v1.1.0)
-
   map %w[--version -v] => :version
 
   desc 'apply FILE', 'execute sql to your database'
@@ -48,61 +46,10 @@ class Convergence::CLI < Thor
     puts "version #{Convergence::VERSION}"
   end
 
-  # TODO: `__fallback` will be removed in a future version(maybe v1.1.0)
-  desc '', '', hide: true
-  method_option :config,
-                aliases: '-c', type: :string,
-                desc: 'Database Yaml Setting'
-  method_option :diff,
-                aliases: '-d', type: :array, default: nil,
-                banner: 'DSL1 DSL2'
-  method_option :export,
-                aliases: '-e', type: :boolean, default: false,
-                desc: 'export db schema to dsl'
-  method_option :input,
-                aliases: '-i', type: :string,
-                desc: 'Input DSL'
-  method_option :dryrun,
-                type: :boolean, default: false
-  method_option :apply,
-                type: :boolean, default: false,
-                desc: 'execute sql to your database'
-  def __fallback
-    command_klass =
-      if !options[:diff].nil? && !options[:diff].empty?
-        require 'convergence/command/diff'
-        opts = { diff: options[:diff] }
-        Convergence::Command::Diff
-      elsif options[:export]
-        require 'convergence/command/export'
-        opts = {}
-        Convergence::Command::Export
-      elsif options[:dryrun]
-        require 'convergence/command/dryrun'
-        opts = { input: options[:input] }
-        Convergence::Command::Dryrun
-      elsif options[:apply]
-        require 'convergence/command/apply'
-        opts = { input: options[:input] }
-        Convergence::Command::Apply
-      end
-
-    if command_klass
-      deprecation_warning
-      command_klass.new(opts, config: config).execute
-    else
-      help
-    end
-  end
-
   private
 
   def config
     return unless options[:config]
     @config ||= Convergence::Config.load(options[:config])
-  end
-
-  def deprecation_warning
-    warn '[DEPRECATION] Flag style command is deprecated. Please use sub-command style instead.'
   end
 end
