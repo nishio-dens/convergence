@@ -1,3 +1,9 @@
+## Convergence 1.0.2 (May 24, 2019) ##
+
+* Support ssl connections (PR: #69)
+
+  *yujideveloper*
+
 ## Convergence 1.0.1 (September 27, 2018) ##
 
 * Add Rollback Dryrun command (PR: #64)
