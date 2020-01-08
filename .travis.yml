@@ -1,6 +1,8 @@
 language: ruby
 rvm:
   - 2.4.1
+services:
+  - mysql
 script:
   - bundle install
   - bundle exec rake db:convergence:prepare
