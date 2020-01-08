@@ -1,3 +1,9 @@
+## Convergence 1.0.3 (January 8, 2020) ##
+
+* Support json column (PR: #70)
+
+  *nishio-dens*
+
 ## Convergence 1.0.2 (May 24, 2019) ##
 
 * Support ssl connections (PR: #69)
