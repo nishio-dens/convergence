@@ -246,6 +246,7 @@ Convergence is currently support column types below.
 - datetime
 - timestamp
 - year
+- json
 
 ```
 create_table "tests", comment: 'Column type example' do |t|
