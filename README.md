@@ -152,6 +152,32 @@ username: root
 password:
 ```
 
+#### Use SSL connection
+
+If you would like to use SSL connection, you can specify SSL options in database.yml
+
+```
+$ cat database.yml
+adapter: mysql
+database: convergence_test
+host: 127.0.0.1
+username: root
+password:
+sslca: /path/to/ca-cert.pem
+sslverify: true
+```
+
+Supported ssl options are below:
+* `ssl_mode`
+* `sslkey`
+* `sslcert`
+* `sslca`
+* `sslcapath`
+* `sslcipher`
+* `sslverify`
+
+See [the ssl options section of mysql2 README](https://github.com/brianmario/mysql2/tree/master#ssl-options) for more details of SSL options
+
 ### Export Your DB Schema
 
 First, you need to create database.yml.
