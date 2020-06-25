@@ -70,7 +70,7 @@ class Convergence::Dumper
   end
 
   def key_value_text(k, v)
-    value = if v.to_s == 'true' || v.to_s == 'false' || v =~ /^\d+$/
+    value = if v.to_s == 'true' || v.to_s == 'false' || v.to_s =~ /^\d+$/
               v
             else
               %(#{v.inspect})
