@@ -99,7 +99,7 @@ class Convergence::Diff
     from_columns = from.columns.keys
     to_columns = to.columns.keys
     order_changed_columns = Diff::LCS.diff(from_columns, to_columns)
-      .flatten
+      .flatten(1)
       .select(&:adding?)
       .map(&:element)
     order_changed_columns.each do |column|
