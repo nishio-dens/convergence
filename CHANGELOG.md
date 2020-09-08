@@ -1,3 +1,13 @@
+## Convergence 1.0.4 (September 8, 2020) ##
+
+* Support diff-lcs 1.4 (PR: #75 #76)
+
+  *yujideveloper*
+
+* Fix warning on Ruby 2.6 and later (PR: #77)
+
+  *yujideveloper*
+
 ## Convergence 1.0.3 (January 8, 2020) ##
 
 * Support json column (PR: #70)

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    convergence (1.0.3)
+    convergence (1.0.4)
       diff-lcs
       diffy
       mysql2
@@ -13,7 +13,7 @@ GEM
     ast (2.4.0)
     coderay (1.1.2)
     diff-lcs (1.4.2)
-    diffy (3.3.0)
+    diffy (3.4.0)
     ffi (1.11.3)
     formatador (0.2.5)
     guard (2.16.1)
