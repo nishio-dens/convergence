@@ -1,3 +1,9 @@
+## Convergence 1.0.5 (December 31, 2020) ##
+
+* Update dependent gem (PR: #80)
+
+  *nishio-dens*
+
 ## Convergence 1.0.4 (September 8, 2020) ##
 
 * Support diff-lcs 1.4 (PR: #75 #76)
