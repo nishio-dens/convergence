@@ -2,3 +2,6 @@ tmp/
 tags
 database.yml
 pkg/
+
+.bundle
+.ruby-version
