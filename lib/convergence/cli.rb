@@ -11,6 +11,11 @@ class Convergence::CLI < Thor
   method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
   method_option :dry_run, type: :boolean
   method_option :rollback_dry_run, type: :boolean
+
+  def self.exit_on_failure?
+    true
+  end
+
   def apply(file)
     opts = { input: file }
     if options[:dry_run]
