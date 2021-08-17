@@ -1,0 +1,24 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: ['2.4', '2.5', '2.6', '2.7', '3.0']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+    - name: Install dependencies
+      run: bundle install
+    - name: Start MySQL
+      run: sudo systemctl start mysql.service
+    - name: Prepare database
+      run: bundle exec rake db:convergence:prepare
+    - name: Run tests
+      run: bundle exec rake spec
