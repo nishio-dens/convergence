@@ -13,18 +13,18 @@ namespace :db do
     desc 'Build the databases for tests'
     task :build_databases do
       query = "create database #{mysql_settings[:database]};"
-      system("mysql -u #{mysql_settings[:username]} -h #{mysql_settings[:host]} --port #{mysql_settings[:port]} -e '#{query}'")
+      system("mysql -u #{mysql_settings[:username]} -p#{mysql_settings[:password]} -h #{mysql_settings[:host]} --port #{mysql_settings[:port]} -e '#{query}'")
     end
 
     task :drop_databases do
       query = "drop database #{mysql_settings[:database]};"
-      system("mysql -u #{mysql_settings[:username]} -h #{mysql_settings[:host]} --port #{mysql_settings[:port]} -e '#{query}'")
+      system("mysql -u #{mysql_settings[:username]} -p#{mysql_settings[:password]} -h #{mysql_settings[:host]} --port #{mysql_settings[:port]} -e '#{query}'")
     end
 
     desc 'Create tables on tests databases'
     task :create_tables do
       query_path = "#{File.dirname(__FILE__)}/spec/fixtures/test_db.sql"
-      system("mysql -u #{mysql_settings[:username]} -h #{mysql_settings[:host]} --port #{mysql_settings[:port]} #{mysql_settings[:database]} < #{query_path}")
+      system("mysql -u #{mysql_settings[:username]} -p#{mysql_settings[:password]} -h #{mysql_settings[:host]} --port #{mysql_settings[:port]} #{mysql_settings[:database]} < #{query_path}")
     end
 
     desc 'Prepare the test databases'
