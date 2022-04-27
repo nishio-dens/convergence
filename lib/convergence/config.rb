@@ -45,7 +45,7 @@ class Convergence::Config
   end
 
   def self.load(yaml_path)
-    setting = YAML.safe_load(ERB.new(File.read(yaml_path)).result, [], [], true)
+    setting = YAML.safe_load(ERB.new(File.read(yaml_path)).result, aliases: true)
     new(setting)
   end
 end
