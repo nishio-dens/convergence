@@ -1,3 +1,9 @@
+## Convergence 1.0.6 (April 28, 2022) ##
+
+* Fixes YAML.safe_load arguments (PR: #84)
+
+  *yysaki*
+
 ## Convergence 1.0.5 (December 31, 2020) ##
 
 * Update dependent gem (PR: #80)
