@@ -188,7 +188,7 @@ DROP TABLE `#{table_name}`;
       sql += ' PRIMARY KEY'
     end
     if column.options[:default]
-      sql += " DEFAULT '#{column.options[:default]}'"
+      sql += " DEFAULT #{quote_default_expression(column.options[:default])}"
     end
     if column.options[:comment]
       sql += " COMMENT '#{column.options[:comment]}'"
@@ -243,5 +243,13 @@ DROP TABLE `#{table_name}`;
         "#{key}=#{v}"
       end
     end.join(' ')
+  end
+
+  def quote_default_expression(value)
+    if value.is_a?(Proc)
+      value.call
+    else
+      %('#{value}')
+    end
   end
 end
