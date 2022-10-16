@@ -6,6 +6,7 @@ jobs:
   test:
     name: Test with MySQL ${{ matrix.mysql }}, Ruby ${{ matrix.ruby }}
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.mysql == '8.0' }}
     strategy:
       fail-fast: false
       matrix:
