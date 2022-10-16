@@ -13,15 +13,15 @@ describe Convergence::Dumper do
     end
   end
   let(:table1_dsl) do
-    dsl = <<-DSL
-create_table :dummy_table, engine: "MyISAM" do |t|
-  t.int :id, limit: 11
-  t.varchar :name, limit: 100, null: true, comment: "name"
+    dsl = <<~DSL
+      create_table :dummy_table, engine: "MyISAM" do |t|
+        t.int :id, limit: 11
+        t.varchar :name, limit: 100, null: true, comment: "name"
 
-  t.index :name, name: "idx_name"
-  t.foreign_key :id, reference: :dummy_ref, reference_column: :id, name: "dummy_table_id_fk"
-end
-  DSL
+        t.index :name, name: "idx_name"
+        t.foreign_key :id, reference: :dummy_ref, reference_column: :id, name: "dummy_table_id_fk"
+      end
+    DSL
     dsl.strip
   end
 
@@ -51,15 +51,39 @@ end
       end
 
       let(:table1_dsl) do
-        dsl = <<-DSL
-create_table :"dummy-table", engine: "MyISAM" do |t|
-  t.int :id, limit: 11
-  t.varchar :"column-1", limit: 100, null: true, comment: "column 1"
+        dsl = <<~DSL
+          create_table :"dummy-table", engine: "MyISAM" do |t|
+            t.int :id, limit: 11
+            t.varchar :"column-1", limit: 100, null: true, comment: "column 1"
 
-  t.index :"column-1", name: "idx_column-1"
-  t.foreign_key :"column-1", reference: :"dummy-ref", reference_column: :"dummy-column", name: "dummy-table_column-1_fk"
-end
-      DSL
+            t.index :"column-1", name: "idx_column-1"
+            t.foreign_key :"column-1", reference: :"dummy-ref", reference_column: :"dummy-column", name: "dummy-table_column-1_fk"
+          end
+        DSL
+        dsl.strip
+      end
+
+      it 'should be able to dump dsl' do
+        dsl = Convergence::Dumper.new.dump_table_dsl(table1)
+        expect(dsl).to eq(table1_dsl)
+      end
+    end
+
+    context "when the table column has default option with proc" do
+      let(:table1) do
+        Convergence::Table.new('dummy_table').tap do |t|
+          t.int :edition_number, default: 0
+          t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }
+        end
+      end
+
+      let(:table1_dsl) do
+        dsl = <<~DSL
+          create_table :dummy_table do |t|
+            t.int :edition_number, default: 0
+            t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }
+          end
+        DSL
         dsl.strip
       end
 

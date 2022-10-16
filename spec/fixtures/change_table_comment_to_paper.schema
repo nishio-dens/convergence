@@ -14,6 +14,8 @@ create_table "papers", collate: "utf8_general_ci", comment: "Paper" do |t|
   t.varchar "title1", limit: 300, comment: "Title 1"
   t.varchar "title2", limit: 300, comment: "Title 2"
   t.text "description", null: true, comment: "Description"
+  t.int "edition_number", default: 0
+  t.datetime "published_at", default: -> { "CURRENT_TIMESTAMP" }
 end
 
 create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author Relation" do |t|
