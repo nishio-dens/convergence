@@ -104,6 +104,7 @@ describe Convergence::DSL do
         let(:table_to) do
           Convergence::Table.new('table1').tap do |t|
             t.int('id')
+            t.varchar('name', limit: 200, null: false)
           end
         end
 
@@ -135,130 +136,145 @@ describe Convergence::DSL do
   end
 
   describe '#diff_table' do
-    let(:table_from) do
-      Convergence::Table.new('table1').tap do |t|
-        t.int('id', primary_key: true)
-        t.varchar('name', limit: 200, null: false)
-
-        t.index('name')
-        t.foreign_key('id', reference: 'ref_tables', reference_column: 'ref_id')
-      end
-    end
+    subject(:results) { Convergence::Diff.new.diff_table(table_from, table_to) }
 
     context 'change column options' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+          t.datetime('created_at', default: -> { "CURRENT_TIMESTAMP" })
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
           t.int('id', primary_key: true)
-          t.varchar('name', limit: 300, null: true, unsigned: true)
-
-          t.index('name')
+          t.varchar('name', limit: 300, null: true, unsigned: true)     # option changed
+          t.datetime('created_at', default: -> { "CURRENT_TIMESTAMP" }) # option[:default] not changed
         end
       end
 
       it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
         expect(results[:change_column]['name']).not_to be_nil
         expect(results[:change_column]['name'][:limit]).to eq('300')
         expect(results[:change_column]['name'][:null]).to eq('true')
         expect(results[:change_column]['name'][:unsigned]).to eq('true')
+        expect(results[:change_column]['created_at']).to be_nil
       end
     end
 
     context 'change column order' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
-          t.varchar('name', limit: 300, null: true)
+          t.varchar('name', limit: 200, null: false)
           t.int('id', primary_key: true)
-
-          t.index('name')
         end
       end
 
       it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
-        expect(results[:change_column]['name']).not_to be_nil
+        expect(results[:change_column]['name']).to be_nil
         expect(results[:change_column]['id']).not_to be_nil
         expect(results[:change_column]['id'][:after]).to eq('name')
       end
     end
 
     context 'remove index' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+
+          t.index('name')
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
           t.int('id', primary_key: true)
-          t.varchar('name', limit: 300, null: true)
+          t.varchar('name', limit: 200, null: false)
         end
       end
 
-      it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
-        expect(results[:remove_index].values.first.index_columns).to eq(['name'])
-      end
+      it { expect(results[:remove_index].values.first.index_columns).to eq(['name']) }
     end
 
     context 'add index' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
           t.int('id', primary_key: true)
-          t.varchar('name', limit: 300, null: true)
+          t.varchar('name', limit: 200, null: false)
 
-          t.index('id')
           t.index('name')
         end
       end
 
-      it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
-        expect(results[:add_index].values.first.index_columns).to eq(['id'])
-      end
+      it { expect(results[:add_index].values.first.index_columns).to eq(['name']) }
     end
 
     context 'remove foreign key' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+
+          t.foreign_key('id', reference: 'ref_tables', reference_column: 'ref_id')
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
           t.int('id', primary_key: true)
-          t.varchar('name', limit: 300, null: true)
-
-          t.index('name')
+          t.varchar('name', limit: 200, null: false)
         end
       end
 
-      it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
-        expect(results[:remove_foreign_key].values.first.from_columns).to eq(['id'])
-      end
+      it { expect(results[:remove_foreign_key].values.first.from_columns).to eq(['id']) }
     end
 
     context 'add foreign key' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1').tap do |t|
           t.int('id', primary_key: true)
-          t.varchar('name', limit: 300, null: true)
+          t.varchar('name', limit: 200, null: false)
 
-          t.index('name')
           t.foreign_key('id', reference: 'ref_tables', reference_column: 'ref_id')
-          t.foreign_key('id2', reference: 'ref_tables2', reference_column: 'ref_id2')
         end
       end
 
-      it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
-        expect(results[:add_foreign_key].values.first.from_columns).to eq(['id2'])
-      end
+      it { expect(results[:add_foreign_key].values.first.from_columns).to eq(['id']) }
     end
 
     context 'change table options' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+        end
+      end
       let(:table_to) do
         Convergence::Table.new('table1', engine: 'MyISAM').tap do |t|
-          t.varchar('name', limit: 300, null: true)
           t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
         end
       end
 
-      it do
-        results = Convergence::Diff.new.diff_table(table_from, table_to)
-        expect(results[:change_table_option][:engine]).to eq('MyISAM')
-      end
+      it { expect(results[:change_table_option][:engine]).to eq('MyISAM') }
     end
   end
 end

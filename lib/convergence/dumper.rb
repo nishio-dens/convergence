@@ -72,6 +72,8 @@ class Convergence::Dumper
   def key_value_text(k, v)
     value = if v.to_s == 'true' || v.to_s == 'false' || v.to_s =~ /^\d+$/
               v
+            elsif v.is_a?(Proc)
+              %(-> { #{v.call.inspect} })
             else
               %(#{v.inspect})
             end

@@ -8,6 +8,8 @@ CREATE TABLE `papers` (
   `title1` varchar(300) NOT NULL COMMENT 'Title 1',
   `title2` varchar(300) NOT NULL COMMENT 'Title 2',
   `description` text COMMENT 'Description',
+  `edition_number` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Edition number',
+  `published_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Published at',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_papers_on_slug` (`slug`),
   KEY `index_papers_on_title1_title2` (`title1` (100), `title2` (200))

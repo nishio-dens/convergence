@@ -37,14 +37,17 @@ describe Convergence::Dumper::MysqlSchemaDumper do
         expect(papers.columns['title1']).not_to be_nil
         expect(papers.columns['title2']).not_to be_nil
         expect(papers.columns['description']).not_to be_nil
+        expect(papers.columns['edition_number']).not_to be_nil
+        expect(papers.columns['published_at']).not_to be_nil
       end
 
       it 'should be dump columns in the correct order' do
         papers = subject['papers']
-        expect(papers.columns.keys).to eq(%w(id slug title1 title2 description))
+        expect(papers.columns.keys)
+          .to eq(%w(id slug title1 title2 description edition_number published_at))
       end
 
-      describe 'table options' do
+      describe 'table column options' do
         it 'should be dump primary key' do
           expect(subject['papers'].columns['id'].options[:primary_key]).to be_truthy
         end
@@ -68,6 +71,13 @@ describe Convergence::Dumper::MysqlSchemaDumper do
 
         it 'should be dump unsigned definition' do
           expect(subject['authors'].columns['age'].options[:unsigned]).to be_truthy
+        end
+
+        it 'should be dump default' do
+          expect(subject['papers'].columns['edition_number'].options[:default]).to eq "0"
+          expect(subject['papers'].columns['published_at'].options[:default])
+            .to be_a(Proc)
+            .and have_attributes(call: "CURRENT_TIMESTAMP")
         end
       end
     end

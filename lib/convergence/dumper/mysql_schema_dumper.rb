@@ -125,16 +125,19 @@ class Convergence::Dumper::MysqlSchemaDumper
   end
 
   def parse_column(column)
-    data_type = column['DATA_TYPE']
+    data_type = column['DATA_TYPE'].to_sym
     column_name = column['COLUMN_NAME']
     options = { null: column['IS_NULLABLE'] == 'YES' ? true : false }
-    options.merge!(default: column['COLUMN_DEFAULT']) unless column['COLUMN_DEFAULT'].nil?
+    unless column['COLUMN_DEFAULT'].nil?
+      options.merge!(default: column_default_expression(data_type, column['COLUMN_DEFAULT']))
+    end
     options.merge!(character_set: column['CHARACTER_SET_NAME']) unless column['CHARACTER_SET_NAME'].nil?
     options.merge!(collate: column['COLLATION_NAME']) unless column['COLLATION_NAME'].nil?
     column_type = column['COLUMN_TYPE']
-    if data_type == 'enum' || data_type == 'set'
+    case data_type
+    when :enum, :set
       # TODO: implement
-    elsif data_type == 'decimal'
+    when :decimal
       precision, scale = column_type.scan(/\d+/)
       options.merge!(precision: precision, scale: scale)
     else
@@ -177,6 +180,15 @@ class Convergence::Dumper::MysqlSchemaDumper
       else
         fail NotImplementedError.new('Unknown index type')
       end
+    end
+  end
+
+  def column_default_expression(data_type, value)
+    case [data_type, value]
+    when [:datetime, "CURRENT_TIMESTAMP"], [:timestamp, "CURRENT_TIMESTAMP"]
+      -> { value }
+    else
+      value
     end
   end
 end

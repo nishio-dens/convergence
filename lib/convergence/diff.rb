@@ -76,14 +76,16 @@ class Convergence::Diff
       .map do |column_name, from_column|
         to_column = to.columns[column_name]
         if to_column
-          to_column_option_with_type = (from_column.options.map { |k, _v| { k => nil } }.reduce { |a, e| a.merge(e) } || {})
+          to_column_option_with_type = (from_column.options.map { |k, _v| [k, nil] }.to_h)
             .merge(to_column.options)
             .merge(type: to_column.type)
+            .tap { |opt| opt[:default] = opt[:default].call if opt[:default].is_a?(Proc) }
             .map { |k, v| [k, case_sensitive_column?(k) ? v&.to_s : v&.to_s&.downcase] }
             .to_a
           from_column_option_with_type = from_column
             .options
             .merge(type: from_column.type)
+            .tap { |opt| opt[:default] = opt[:default].call if opt[:default].is_a?(Proc) }
             .map { |k, v| [k, case_sensitive_column?(k) ? v&.to_s : v&.to_s&.downcase] }
             .to_a
           { column_name => Hash[(to_column_option_with_type - from_column_option_with_type)] }
