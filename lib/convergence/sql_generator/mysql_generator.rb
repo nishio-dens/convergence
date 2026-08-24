@@ -13,11 +13,11 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
 
   attr_reader :original_table
 
-  def generate(to_table, delta, original_table)
+  def generate(to_table, delta, original_table, safe_migration: false)
     @original_table = original_table
     sqls = []
     sqls << change_table_sql(to_table, delta)
-    sqls << drop_table_sqls(delta)
+    sqls << (safe_migration ? [] : drop_table_sqls(delta))
     sqls << create_table_sqls(delta)
     sqls.reject!(&:empty?)
     sqls.join("\n")
