@@ -51,7 +51,7 @@ class Convergence::DefaultParameter::MysqlDefaultParameter
   DEFAULT_COLUMN_PARAMETERS = {
     null: false
   }
-  TEXT_TYPE = [:varchar, :char, :tiny_text, :text, :mediumtext, :longtext]
+  TEXT_TYPE = [:varchar, :char, :tiny_text, :text, :mediumtext, :longtext, :enum, :set]
   DEFAULT_COLUMN_TYPE_PARAMETERS = {
     tinyint: {
       limit: 4

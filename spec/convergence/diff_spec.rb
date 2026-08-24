@@ -163,6 +163,42 @@ describe Convergence::DSL do
       end
     end
 
+    context 'change enum/set column values' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.enum('status', values: %w(Active Inactive))
+        end
+      end
+
+      context 'when values are identical' do
+        let(:table_to) do
+          Convergence::Table.new('table1').tap do |t|
+            t.int('id', primary_key: true)
+            t.enum('status', values: %w(Active Inactive))
+          end
+        end
+
+        it 'does not detect a change' do
+          expect(results[:change_column]['status']).to be_nil
+        end
+      end
+
+      context 'when only the letter case differs' do
+        let(:table_to) do
+          Convergence::Table.new('table1').tap do |t|
+            t.int('id', primary_key: true)
+            t.enum('status', values: %w(active inactive))
+          end
+        end
+
+        it 'detects the change since values are case-sensitive' do
+          expect(results[:change_column]['status']).not_to be_nil
+          expect(results[:change_column]['status'][:values]).to eq('["active", "inactive"]')
+        end
+      end
+    end
+
     context 'change column order' do
       let(:table_from) do
         Convergence::Table.new('table1').tap do |t|

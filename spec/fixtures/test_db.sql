@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS `paper_authors`;
 DROP TABLE IF EXISTS `papers`;
 DROP TABLE IF EXISTS `authors`;
+DROP TABLE IF EXISTS `enum_set_samples`;
 
 CREATE TABLE `papers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -35,3 +36,10 @@ CREATE TABLE `paper_authors` (
   CONSTRAINT `paper_authors_author_id_fk` FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`),
   CONSTRAINT `paper_authors_paper_id_fk` FOREIGN KEY (`paper_id`) REFERENCES `papers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='Paper Author Relation';
+
+CREATE TABLE `enum_set_samples` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` enum('active','inactive','pending') NOT NULL DEFAULT 'active',
+  `flags` set('a','b','it''s tricky') NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;

@@ -1,0 +1,5 @@
+create_table 'enum_set_dummies' do |t|
+  t.int 'id', primary_key: true, extra: 'auto_increment'
+  t.enum 'status', values: %w(active inactive pending), default: 'active'
+  t.set 'flags', values: %w(a b c)
+end

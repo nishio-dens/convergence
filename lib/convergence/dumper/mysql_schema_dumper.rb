@@ -136,7 +136,7 @@ class Convergence::Dumper::MysqlSchemaDumper
     column_type = column['COLUMN_TYPE']
     case data_type
     when :enum, :set
-      # TODO: implement
+      options.merge!(values: parse_enum_or_set_values(column_type))
     when :decimal
       precision, scale = column_type.scan(/\d+/)
       options.merge!(precision: precision, scale: scale)
@@ -181,6 +181,15 @@ class Convergence::Dumper::MysqlSchemaDumper
         fail NotImplementedError.new('Unknown index type')
       end
     end
+  end
+
+  # column_type looks like "enum('a','b','c')" or "set('a','b','c')"
+  def parse_enum_or_set_values(column_type)
+    column_type[/\A(?:enum|set)\((.*)\)\z/i, 1]
+      .to_s
+      .scan(/'((?:[^']|'')*)'/)
+      .flatten
+      .map { |v| v.gsub("''", "'") }
   end
 
   def column_default_expression(data_type, value)
