@@ -11,13 +11,14 @@ class Convergence::CLI < Thor
   method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
   method_option :dry_run, type: :boolean
   method_option :rollback_dry_run, type: :boolean
+  method_option :ignore_auto_increment, type: :boolean, desc: 'Do not generate AUTO_INCREMENT change queries'
 
   def self.exit_on_failure?
     true
   end
 
   def apply(file)
-    opts = { input: file }
+    opts = { input: file, ignore_auto_increment: options[:ignore_auto_increment] }
     if options[:dry_run]
       require 'convergence/command/dryrun'
       Convergence::Command::Dryrun.new(opts, config: config).execute

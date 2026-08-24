@@ -4,6 +4,10 @@ class Convergence::Diff
   CASE_SENSITIVE_TABLE_OPTIONS = %i(comment)
   CASE_SENSITIVE_COLUMNS = %i(default comment)
 
+  def initialize(ignore_auto_increment: false)
+    @ignore_auto_increment = ignore_auto_increment
+  end
+
   def diff(from_database, to_database)
     delta = {}
     from_database = {} if from_database.nil?
@@ -177,6 +181,7 @@ class Convergence::Diff
   end
 
   def remove_auto_increment_option?(from_value, to_value)
+    return true if @ignore_auto_increment
     return true if from_value.nil? || to_value.nil?
     from_value >= to_value
   end

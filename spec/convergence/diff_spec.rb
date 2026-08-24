@@ -136,7 +136,35 @@ describe Convergence::DSL do
   end
 
   describe '#diff_table' do
-    subject(:results) { Convergence::Diff.new.diff_table(table_from, table_to) }
+    subject(:results) { Convergence::Diff.new(**diff_options).diff_table(table_from, table_to) }
+    let(:diff_options) { {} }
+
+    context 'change auto_increment table option' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.table_options = { auto_increment: 1 }
+        end
+      end
+      let(:table_to) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.table_options = { auto_increment: 5000 }
+        end
+      end
+
+      it 'detects the auto_increment change by default' do
+        expect(results[:change_table_option][:auto_increment]).to eq(5000)
+      end
+
+      context 'when ignore_auto_increment is enabled' do
+        let(:diff_options) { { ignore_auto_increment: true } }
+
+        it 'ignores the auto_increment change' do
+          expect(results[:change_table_option]).not_to have_key(:auto_increment)
+        end
+      end
+    end
 
     context 'change column options' do
       let(:table_from) do
