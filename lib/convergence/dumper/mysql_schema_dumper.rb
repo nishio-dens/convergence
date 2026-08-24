@@ -110,8 +110,8 @@ class Convergence::Dumper::MysqlSchemaDumper
     option.merge!(engine: table_option['ENGINE'])
     row_format = table_option['CREATE_OPTIONS'].scan(/=(.*)/).flatten[0] || table_option['ROW_FORMAT']
     option.merge!(row_format: row_format)
-    option.merge!(default_charset: table_option['CHARACTER_SET_NAME'])
-    option.merge!(collate: table_option['TABLE_COLLATION'])
+    option.merge!(default_charset: normalize_charset(table_option['CHARACTER_SET_NAME']))
+    option.merge!(collate: normalize_charset(table_option['TABLE_COLLATION']))
     option.merge!(comment: table_option['TABLE_COMMENT'])
     option.merge!(auto_increment: table_option['AUTO_INCREMENT']) if table_option['AUTO_INCREMENT']
     table.table_options = option
@@ -131,8 +131,8 @@ class Convergence::Dumper::MysqlSchemaDumper
     unless column['COLUMN_DEFAULT'].nil?
       options.merge!(default: column_default_expression(data_type, column['COLUMN_DEFAULT']))
     end
-    options.merge!(character_set: column['CHARACTER_SET_NAME']) unless column['CHARACTER_SET_NAME'].nil?
-    options.merge!(collate: column['COLLATION_NAME']) unless column['COLLATION_NAME'].nil?
+    options.merge!(character_set: normalize_charset(column['CHARACTER_SET_NAME'])) unless column['CHARACTER_SET_NAME'].nil?
+    options.merge!(collate: normalize_charset(column['COLLATION_NAME'])) unless column['COLLATION_NAME'].nil?
     column_type = column['COLUMN_TYPE']
     case data_type
     when :enum, :set
@@ -181,6 +181,13 @@ class Convergence::Dumper::MysqlSchemaDumper
         fail NotImplementedError.new('Unknown index type')
       end
     end
+  end
+
+  # MySQL 8.0.24+ reports the `utf8` charset/collation as `utf8mb3` (e.g. `utf8mb3_general_ci`).
+  # Normalize it back to `utf8` so it still matches schemas written with the traditional name.
+  def normalize_charset(value)
+    return value if value.nil?
+    value.sub(/\Autf8mb3/, 'utf8')
   end
 
   def column_default_expression(data_type, value)
