@@ -27,6 +27,9 @@ class Convergence::Command
                 when 'mysql', 'mysql2'
                   require 'convergence/dumper/mysql_schema_dumper'
                   Convergence::Dumper::MysqlSchemaDumper.new(connector)
+                when 'postgresql', 'postgres', 'pg'
+                  require 'convergence/dumper/postgres_schema_dumper'
+                  Convergence::Dumper::PostgresSchemaDumper.new(connector)
                 else
                   fail NotImplementedError.new('unknown database adapter')
                 end

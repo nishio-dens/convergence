@@ -29,19 +29,31 @@ class Convergence::Command::Apply < Convergence::Command
                        when 'mysql', 'mysql2'
                          require 'convergence/sql_generator/mysql_generator'
                          SQLGenerator::MysqlGenerator.new
+                       when 'postgresql', 'postgres', 'pg'
+                         require 'convergence/sql_generator/postgres_generator'
+                         SQLGenerator::PostgresGenerator.new
                        else
                          fail NotImplementedError.new('unknown database adapter')
                        end
   end
 
-  def execute_sql(input_tables, current_tables)
-    sql = generate_sql(input_tables, current_tables)
-    unless sql.strip.empty?
-      sql = <<-SQL
+  def wrap_with_constraint_pragma(sql)
+    case database_adapter
+    when 'mysql', 'mysql2'
+      <<-SQL
 SET FOREIGN_KEY_CHECKS=0;
       #{sql}
 SET FOREIGN_KEY_CHECKS=1;
       SQL
+    else
+      sql
+    end
+  end
+
+  def execute_sql(input_tables, current_tables)
+    sql = generate_sql(input_tables, current_tables)
+    unless sql.strip.empty?
+      sql = wrap_with_constraint_pragma(sql)
     end
     sql.split(';').each do |q2|
       q = q2.strip
