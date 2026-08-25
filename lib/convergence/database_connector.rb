@@ -10,6 +10,9 @@ class Convergence::DatabaseConnector
       when 'postgresql', 'postgres', 'pg'
         require 'convergence/database_connector/postgres_connector'
         Convergence::DatabaseConnector::PostgresConnector.new(config)
+      when 'sqlite3', 'sqlite'
+        require 'convergence/database_connector/sqlite_connector'
+        Convergence::DatabaseConnector::SqliteConnector.new(config)
       else
         fail NotImplementedError.new("#{config.adapter} not supported yet")
       end

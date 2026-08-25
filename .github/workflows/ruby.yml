@@ -36,8 +36,8 @@ jobs:
           --health-retries 5
     steps:
     - uses: actions/checkout@v4
-    - name: Install PostgreSQL client libraries
-      run: sudo apt-get update && sudo apt-get install -y libpq-dev
+    - name: Install PostgreSQL and SQLite client libraries
+      run: sudo apt-get update && sudo apt-get install -y libpq-dev libsqlite3-dev sqlite3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -49,5 +49,7 @@ jobs:
       run: bundle exec rake db:convergence:prepare
     - name: Prepare PostgreSQL database
       run: bundle exec rake db:convergence:postgres:prepare
+    - name: Prepare SQLite database
+      run: bundle exec rake db:convergence:sqlite:prepare
     - name: Run tests
       run: bundle exec rake spec

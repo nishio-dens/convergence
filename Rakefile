@@ -8,6 +8,7 @@ task default: :spec
 spec_database_settings = YAML.load_file("#{File.dirname(__FILE__)}/spec/config/spec_database.yml")
 mysql_settings = Hash[spec_database_settings['mysql'].map { |k, v| [k.to_sym, v] }]
 postgres_settings = Hash[spec_database_settings['postgresql'].map { |k, v| [k.to_sym, v] }]
+sqlite_db_path = File.expand_path("#{File.dirname(__FILE__)}/spec/fixtures/#{spec_database_settings['sqlite3']['database']}")
 
 namespace :db do
   namespace :convergence do
@@ -54,6 +55,23 @@ namespace :db do
       desc 'Prepare the PostgreSQL test database'
       task prepare: [:build_databases, :create_tables]
       task overhaul: [:drop_databases, :build_databases, :create_tables]
+    end
+
+    namespace :sqlite do
+      desc 'Remove the SQLite test database file'
+      task :drop_databases do
+        File.delete(sqlite_db_path) if File.exist?(sqlite_db_path)
+      end
+
+      desc 'Create tables on the SQLite test database'
+      task :create_tables do
+        query_path = "#{File.dirname(__FILE__)}/spec/fixtures/sqlite_test_db.sql"
+        system("sqlite3 #{sqlite_db_path} < #{query_path}")
+      end
+
+      desc 'Prepare the SQLite test database'
+      task prepare: [:drop_databases, :create_tables]
+      task overhaul: [:drop_databases, :create_tables]
     end
   end
 end

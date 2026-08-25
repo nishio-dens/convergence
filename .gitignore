@@ -2,6 +2,7 @@ tmp/
 tags
 database.yml
 pkg/
+spec/fixtures/sqlite_test_db.sqlite3
 
 .bundle
 .ruby-version

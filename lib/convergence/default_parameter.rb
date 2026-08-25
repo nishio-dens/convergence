@@ -7,6 +7,9 @@ class Convergence::DefaultParameter
     when 'postgresql', 'postgres', 'pg'
       require 'convergence/default_parameter/postgres_default_parameter'
       @parameter_klass = Convergence::DefaultParameter::PostgresDefaultParameter.new
+    when 'sqlite3', 'sqlite'
+      require 'convergence/default_parameter/sqlite_default_parameter'
+      @parameter_klass = Convergence::DefaultParameter::SqliteDefaultParameter.new
     else
       fail NotImplementedError.new("unknown adapter #{config.adapter}.")
     end

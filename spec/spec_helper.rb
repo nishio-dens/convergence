@@ -6,6 +6,7 @@ require 'convergence'
 require 'convergence/database_connector'
 Dir["#{File.dirname(__FILE__)}/integrations/**/*.rb"].each { |f| require f }
 Dir["#{File.dirname(__FILE__)}/postgres_integrations/**/*.rb"].each { |f| require f }
+Dir["#{File.dirname(__FILE__)}/sqlite_integrations/**/*.rb"].each { |f| require f }
 
 $default_output = File.open('/dev/null', 'w')
 
@@ -17,6 +18,12 @@ end
 def postgres_settings
   postgres_settings = YAML.load_file("#{File.dirname(__FILE__)}/config/spec_database.yml")['postgresql']
   Convergence::Config.new(Hash[postgres_settings.map { |k, v| [k.to_sym, v] }])
+end
+
+def sqlite_settings
+  sqlite_settings = YAML.load_file("#{File.dirname(__FILE__)}/config/spec_database.yml")['sqlite3']
+  database_path = File.expand_path("#{File.dirname(__FILE__)}/fixtures/#{sqlite_settings['database']}")
+  Convergence::Config.new(adapter: sqlite_settings['adapter'], database: database_path)
 end
 
 def rollback

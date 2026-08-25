@@ -13,3 +13,7 @@ postgresql:
   port: 5432
   username: postgres
   password: postgres
+
+sqlite3:
+  adapter: sqlite3
+  database: sqlite_test_db.sqlite3
