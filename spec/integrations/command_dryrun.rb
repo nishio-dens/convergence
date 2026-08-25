@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'convergence/command/dryrun'
 
 describe 'Command::Dryrun#execute' do
-  def execute(dsl_path)
+  def execute(dsl_path, extra_options = {})
     parse_option = {
       input: File.expand_path("#{File.dirname(__FILE__)}/../fixtures/#{dsl_path}")
-    }
+    }.merge(extra_options)
     Convergence::Command::Dryrun.new(parse_option, config: mysql_settings).execute
   end
 
@@ -41,6 +41,13 @@ describe 'Command::Dryrun#execute' do
     it 'should be output drop table query' do
       result = execute(exec_dsl)
       expect(result).to be_include('DROP TABLE `paper_authors`')
+    end
+
+    context 'when safe_migration is enabled' do
+      it 'should not output drop table query' do
+        result = execute(exec_dsl, safe_migration: true)
+        expect(result).not_to be_include('DROP TABLE `paper_authors`')
+      end
     end
   end
 

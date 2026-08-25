@@ -133,6 +133,7 @@ Create Table: CREATE TABLE `test_tables` (
 ```
 Commands:
   convergence apply FILE -c, --config=CONFIG   # execute sql to your database
+                                                # [--dry-run], [--rollback-dry-run], [--safe-migration]
   convergence diff FILE1 FILE2                 # print diff of DSLs
   convergence export -c, --config=CONFIG       # export db schema to dsl
   convergence help [COMMAND]                   # Describe available commands or one specific command
@@ -234,6 +235,17 @@ $ convergence apply example.schema -c database.yml --rollback-dry-run
 ```
 $ convergence apply example.schema -c database.yml
 ```
+
+### Safe migration
+
+If you want to prevent convergence from ever dropping a table (e.g. when the DSL file removed a table that still
+has important data), pass `--safe-migration`. It skips generating `DROP TABLE` queries; every other change is still applied.
+
+```
+$ convergence apply example.schema -c database.yml --safe-migration
+```
+
+This also applies to `--dry-run` and `--rollback-dry-run`.
 
 ### Include Other Schema files
 

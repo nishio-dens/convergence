@@ -19,7 +19,12 @@ class Convergence::Command::Apply < Convergence::Command
     input_tables_with_full_option =
       Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
     delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
-    sql_generator.generate(input_tables_with_full_option, delta, current_tables_with_full_option)
+    sql_generator.generate(
+      input_tables_with_full_option,
+      delta,
+      current_tables_with_full_option,
+      safe_migration: @opts[:safe_migration]
+    )
   end
 
   private
