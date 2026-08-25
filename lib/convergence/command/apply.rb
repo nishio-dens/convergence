@@ -39,6 +39,9 @@ class Convergence::Command::Apply < Convergence::Command
                        when 'postgresql', 'postgres', 'pg'
                          require 'convergence/sql_generator/postgres_generator'
                          SQLGenerator::PostgresGenerator.new
+                       when 'sqlite3', 'sqlite'
+                         require 'convergence/sql_generator/sqlite_generator'
+                         SQLGenerator::SqliteGenerator.new
                        else
                          fail NotImplementedError.new('unknown database adapter')
                        end

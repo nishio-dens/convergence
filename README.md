@@ -1,7 +1,7 @@
 # Convergence
 
 Convergence is a pure-Ruby database schema migration tool.
-Currently, This tool supports MySQL and PostgreSQL.
+Currently, This tool supports MySQL, PostgreSQL, and SQLite.
 
 It defines DB Schema using Convergence DSL(like Rails DSL).
 For more information about Convergence DSL, See below ['Detail About Convergence DSL'](#detail-about-convergence-dsl)
@@ -174,6 +174,27 @@ native PostgreSQL type (e.g. `mediumint`/`int` → `integer`, `datetime` → `ti
 A few MySQL-specific concepts have no PostgreSQL equivalent and are ignored on that adapter: `engine`,
 `row_format`, `default_charset`/`character_set`, and `collate`. `enum`/`set` column types are not supported yet
 on PostgreSQL.
+
+To use SQLite instead, set `adapter: sqlite3` (`sqlite` also works) and point `database` at a file path:
+
+```
+$ cat database.yml
+adapter: sqlite3
+database: /path/to/development.sqlite3
+```
+
+#### SQLite notes
+
+SQLite's `ALTER TABLE` support is intentionally limited by SQLite itself: it can only add/drop columns and
+create/drop indexes on an existing table. Changing a column's type/null/default, and adding or removing a
+foreign key or primary key on an existing table, all require SQLite's own "rebuild the table" procedure
+(create a new table, copy the data over, drop the old one, rename it), which this adapter does not implement
+yet -- it raises `NotImplementedError` instead of generating SQL that SQLite would reject. Creating a brand new
+table with any of the above (including foreign keys) works fine.
+
+Like PostgreSQL, MySQL-only table options (`engine`, `row_format`, `default_charset`/`character_set`, `collate`,
+table/column `comment`) have no SQLite equivalent and are ignored. `extra: 'auto_increment'` maps to SQLite's
+`INTEGER PRIMARY KEY AUTOINCREMENT`.
 
 #### Use SSL connection
 
@@ -395,6 +416,7 @@ end
 ```
 $ bundle exec rake db:convergence:prepare
 $ bundle exec rake db:convergence:postgres:prepare
+$ bundle exec rake db:convergence:sqlite:prepare
 $ bundle exec rspec
 ```
 

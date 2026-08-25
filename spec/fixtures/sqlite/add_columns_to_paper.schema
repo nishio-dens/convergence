@@ -1,0 +1,29 @@
+create_table "authors" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "name", limit: 110
+  t.int "age"
+  t.datetime "created_at", null: true
+  t.datetime "updated_at", null: true
+
+  t.index "created_at", name: "index_authors_on_created_at"
+end
+
+create_table "papers" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "slug", limit: 255
+  t.varchar "title1", limit: 300
+  t.varchar "title2", limit: 300
+  t.text "description", null: true
+  t.varchar "subtitle", null: true
+
+  t.index "slug", name: "index_papers_on_slug", unique: true
+end
+
+create_table "paper_authors" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.int "paper_id"
+  t.int "author_id"
+
+  t.foreign_key "author_id", reference: "authors", reference_column: "id", name: "paper_authors_author_id_fk"
+  t.foreign_key "paper_id", reference: "papers", reference_column: "id", name: "paper_authors_paper_id_fk"
+end
