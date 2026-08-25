@@ -398,6 +398,11 @@ $ bundle exec rake db:convergence:postgres:prepare
 $ bundle exec rspec
 ```
 
+## Contributing
+
+Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up a
+development environment, run the test suite, and what to include in a pull request.
+
 ## Copyright
 
 Copyright © 2014-2018 S.nishio. See LICENSE.txt for further details.
