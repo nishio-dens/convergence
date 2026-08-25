@@ -2,7 +2,7 @@ require 'diff/lcs'
 
 class Convergence::Diff
   CASE_SENSITIVE_TABLE_OPTIONS = %i(comment)
-  CASE_SENSITIVE_COLUMNS = %i(default comment)
+  CASE_SENSITIVE_COLUMNS = %i(default comment values)
 
   def diff(from_database, to_database)
     delta = {}

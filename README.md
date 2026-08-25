@@ -285,6 +285,8 @@ Convergence is currently support column types below.
 - timestamp
 - year
 - json
+- enum
+- set
 
 ```
 create_table "tests", comment: 'Column type example' do |t|
@@ -294,6 +296,8 @@ create_table "tests", comment: 'Column type example' do |t|
   t.varchar 'test_string', null: true, default: 'hello', limit: 300
   t.text 'text_col'
   t.datetime 'created_at'
+  t.enum 'status', values: %w(active inactive pending), default: 'active'
+  t.set 'flags', values: %w(a b c)
 end
 ```
 

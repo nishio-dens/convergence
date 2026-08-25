@@ -106,6 +106,19 @@ describe Convergence::Dumper::MysqlSchemaDumper do
       end
     end
 
+    describe 'enum/set columns' do
+      it 'should be dump enum values' do
+        expect(subject['enum_set_samples'].columns['status'].options[:values])
+          .to eq(%w(active inactive pending))
+        expect(subject['enum_set_samples'].columns['status'].options[:default]).to eq('active')
+      end
+
+      it 'should be dump set values, including values containing quotes' do
+        expect(subject['enum_set_samples'].columns['flags'].options[:values])
+          .to eq(['a', 'b', "it's tricky"])
+      end
+    end
+
     describe 'foreign keys' do
       it do
         foreign_key = subject['paper_authors'].foreign_keys['paper_authors_author_id_fk']
