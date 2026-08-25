@@ -45,9 +45,11 @@ class Convergence::CLI < Thor
 
   desc 'export', 'export db schema to dsl'
   method_option :config, aliases: '-c', type: :string, required: true, desc: 'Database Yaml Setting'
+  method_option :dump_rails_migration, type: :boolean, desc: 'Output an ActiveRecord migration file instead of a Convergence DSL file'
+  method_option :filename, type: :string, desc: 'Base filename (without timestamp/extension) used for --dump-rails-migration'
   def export
     require 'convergence/command/export'
-    opts = {}
+    opts = { dump_rails_migration: options[:dump_rails_migration], filename: options[:filename] }
     Convergence::Command::Export.new(opts, config: config).execute
   end
 

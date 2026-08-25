@@ -136,6 +136,7 @@ Commands:
                                                 # [--dry-run], [--rollback-dry-run], [--safe-migration], [--ignore-auto-increment]
   convergence diff FILE1 FILE2                 # print diff of DSLs
   convergence export -c, --config=CONFIG       # export db schema to dsl
+                                                # [--dump-rails-migration], [--filename=FILENAME]
   convergence help [COMMAND]                   # Describe available commands or one specific command
   convergence version                          # print the version
 ```
@@ -259,6 +260,43 @@ create_table "paper_authors", collate: "utf8_general_ci", comment: "Paper Author
   t.foreign_key "paper_id", reference: "papers", reference_column: "id", name: "paper_authors_paper_id_fk"
 end
 ```
+
+### Export as a Rails migration file
+
+If you're migrating to (or working alongside) a Rails app, pass `--dump-rails-migration` to export the schema as an
+ActiveRecord migration instead of a Convergence DSL file. `--filename` sets the base filename/class name (Rails'
+usual `snake_case` filename / `CamelCase` class name convention applies).
+
+```
+$ convergence export -c database.yml --dump-rails-migration --filename create_initial_tables
+```
+
+```ruby
+# Filename: 20240101000000_create_initial_tables.rb
+class CreateInitialTables < ActiveRecord::Migration[7.0]
+  def change
+    create_table :authors do |t|
+      t.string :name, limit: 110
+      t.timestamps
+
+      t.index :created_at, name: "index_authors_on_created_at"
+    end
+  end
+end
+```
+
+The output is written to stdout with a `# Filename: ...` comment on top (including a timestamp prefix in the usual
+Rails migration filename format) — redirect it to that file yourself, e.g.
+`convergence export ... > db/migrate/$(date +%Y%m%d%H%M%S)_create_initial_tables.rb`.
+
+A few notes on the conversion:
+* An `id` column that matches Rails' implicit auto-incrementing primary key (`int`/`bigint`, `primary_key: true`,
+  `extra: 'auto_increment'`) is omitted, since `create_table` adds it automatically.
+* `created_at`/`updated_at` columns with matching `datetime`/`null` options are collapsed into `t.timestamps`.
+* Column types use Rails' type names (e.g. `varchar` → `string`, `datetime`/`timestamp` → `datetime`); `enum`/`set`
+  have no ActiveRecord equivalent and fall back to `string`.
+* MySQL-only concepts with no `create_table` DSL equivalent (`character_set`, `collate`, `extra`, `after`) are
+  dropped from column definitions.
 
 ### Dry run
 
