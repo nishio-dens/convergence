@@ -23,8 +23,21 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
     - uses: actions/checkout@v4
+    - name: Install PostgreSQL client libraries
+      run: sudo apt-get update && sudo apt-get install -y libpq-dev
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -34,5 +47,7 @@ jobs:
       run: bundle install
     - name: Prepare database
       run: bundle exec rake db:convergence:prepare
+    - name: Prepare PostgreSQL database
+      run: bundle exec rake db:convergence:postgres:prepare
     - name: Run tests
       run: bundle exec rake spec

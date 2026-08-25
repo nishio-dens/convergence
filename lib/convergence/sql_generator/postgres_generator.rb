@@ -211,6 +211,7 @@ CREATE TABLE "#{table_name}" (
   end
 
   def postgres_column_type(column)
+    return 'boolean' if column.type == :tinyint && column.options[:limit].to_s == '1'
     type = TYPE_MAPPING[column.type] || column.type.to_s
     if TYPES_WITH_LIMIT.include?(column.type) && column.options[:limit]
       "#{type}(#{column.options[:limit]})"

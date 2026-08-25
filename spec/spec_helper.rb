@@ -5,12 +5,18 @@ require 'pry'
 require 'convergence'
 require 'convergence/database_connector'
 Dir["#{File.dirname(__FILE__)}/integrations/**/*.rb"].each { |f| require f }
+Dir["#{File.dirname(__FILE__)}/postgres_integrations/**/*.rb"].each { |f| require f }
 
 $default_output = File.open('/dev/null', 'w')
 
 def mysql_settings
   mysql_settings = YAML.load_file("#{File.dirname(__FILE__)}/config/spec_database.yml")['mysql']
   Convergence::Config.new(Hash[mysql_settings.map { |k, v| [k.to_sym, v] }])
+end
+
+def postgres_settings
+  postgres_settings = YAML.load_file("#{File.dirname(__FILE__)}/config/spec_database.yml")['postgresql']
+  Convergence::Config.new(Hash[postgres_settings.map { |k, v| [k.to_sym, v] }])
 end
 
 def rollback

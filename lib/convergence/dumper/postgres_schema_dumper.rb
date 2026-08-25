@@ -20,7 +20,10 @@ class Convergence::Dumper::PostgresSchemaDumper
     'float4' => :float,
     'float8' => :double,
     'json' => :json,
-    'jsonb' => :json
+    'jsonb' => :json,
+    # Convergence has no native boolean DSL type; store it as tinyint(1), the same
+    # representation Convergence::Table#boolean produces for the MySQL adapter.
+    'bool' => :tinyint
   }.freeze
   DEFAULT_VALUE_PATTERN = /\A'(?<value>(?:[^']|'')*)'(?:::[\w. ]+)?\z/.freeze
 
@@ -142,6 +145,8 @@ class Convergence::Dumper::PostgresSchemaDumper
       options.merge!(precision: column['numeric_precision'], scale: column['numeric_scale'])
     when :varchar, :char
       options.merge!(limit: column['character_maximum_length']) unless column['character_maximum_length'].nil?
+    when :tinyint
+      options.merge!(limit: '1') if column['udt_name'] == 'bool'
     end
     options.merge!(comment: column['column_comment']) unless column['column_comment'].nil?
     [data_type, column_name, options]
@@ -149,6 +154,7 @@ class Convergence::Dumper::PostgresSchemaDumper
 
   def column_default_expression(data_type, value)
     return -> { 'CURRENT_TIMESTAMP' } if [:datetime].include?(data_type) && value.start_with?('CURRENT_TIMESTAMP')
+    return (value == 'true' ? '1' : '0') if data_type == :tinyint && %w(true false).include?(value)
     match = DEFAULT_VALUE_PATTERN.match(value)
     return match[:value].gsub("''", "'") if match
     value
