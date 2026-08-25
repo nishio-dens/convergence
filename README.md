@@ -191,7 +191,9 @@ create/drop indexes on an existing table. Changing a column's type/null/default,
 foreign key or primary key on an existing table, all require SQLite's own "rebuild the table" procedure
 (create a new table, copy the data over, drop the old one, rename it), which this adapter does not implement
 yet -- it raises `NotImplementedError` instead of generating SQL that SQLite would reject. Creating a brand new
-table with any of the above (including foreign keys) works fine.
+table with any of the above (including foreign keys) works fine. Renaming a table/column via `renamed_from:`
+(see [Rename tables and columns](#rename-tables-and-columns)) is an exception to this limitation -- SQLite has
+natively supported `RENAME TABLE`/`RENAME COLUMN` since 3.25.0, so it doesn't need the rebuild procedure.
 
 Like PostgreSQL, MySQL-only table options (`engine`, `row_format`, `default_charset`/`character_set`, `collate`,
 table/column `comment`) have no SQLite equivalent and are ignored. `extra: 'auto_increment'` maps to SQLite's
@@ -339,6 +341,33 @@ $ convergence apply example.schema -c database.yml --safe-migration
 ```
 
 This also applies to `--dry-run` and `--rollback-dry-run`.
+
+### Rename tables and columns
+
+Without `renamed_from:`, convergence detects a renamed table/column as a drop followed by an add -- which loses
+the data in that table/column. Add `renamed_from:` to the new name so convergence generates `RENAME TABLE`/`RENAME
+COLUMN` instead:
+
+```ruby
+create_table "user_accounts", renamed_from: "users" do |t|
+  t.int "id", primary_key: true, extra: "auto_increment"
+  t.varchar "full_name", limit: 200, renamed_from: "name"
+end
+```
+
+A few things to know:
+
+* When a table or column has `renamed_from:`, **only the rename is applied on that pass** -- any other change to
+  the same table/column (a type change, a new `null`/`default`, ...) is ignored until you run `apply` again. Run
+  `apply` a second time (with `renamed_from:` still in place, or removed) to pick up the rest.
+* `renamed_from:` is safe to leave in the schema file after the rename has been applied -- convergence detects
+  that the target name already exists and treats it as a no-op.
+* Swapping two names (A ↔ B) or chaining renames (A → B → C) in a single `apply` is not supported. Use an
+  intermediate temporary name and apply in multiple steps instead.
+* MySQL's `RENAME COLUMN` requires MySQL 8.0+; there's no fallback for 5.7.
+* `convergence diff`'s pretty-printed output does not yet understand renames -- it will describe a rename as "no
+  change" for the renamed table/column. This is a known limitation, unrelated to the SQL that `apply`/`dry-run`
+  actually generate.
 
 ### Include Other Schema files
 
