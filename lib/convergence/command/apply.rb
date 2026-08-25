@@ -18,7 +18,9 @@ class Convergence::Command::Apply < Convergence::Command
       Convergence::DefaultParameter.append_database_default_parameter(current_tables, database_adapter)
     input_tables_with_full_option =
       Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
-    delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
+    delta = Convergence::Diff
+      .new(ignore_auto_increment: @opts[:ignore_auto_increment])
+      .diff(current_tables_with_full_option, input_tables_with_full_option)
     sql_generator.generate(
       input_tables_with_full_option,
       delta,

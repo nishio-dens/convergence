@@ -133,7 +133,7 @@ Create Table: CREATE TABLE `test_tables` (
 ```
 Commands:
   convergence apply FILE -c, --config=CONFIG   # execute sql to your database
-                                                # [--dry-run], [--rollback-dry-run], [--safe-migration]
+                                                # [--dry-run], [--rollback-dry-run], [--safe-migration], [--ignore-auto-increment]
   convergence diff FILE1 FILE2                 # print diff of DSLs
   convergence export -c, --config=CONFIG       # export db schema to dsl
   convergence help [COMMAND]                   # Describe available commands or one specific command
@@ -257,6 +257,18 @@ $ convergence apply example.schema -c database.yml --rollback-dry-run
 ```
 $ convergence apply example.schema -c database.yml
 ```
+
+### Ignore AUTO_INCREMENT changes
+
+If you dump your schema from a database with a high AUTO_INCREMENT value (e.g. a dev/staging box you've been testing on)
+and apply it to another database, convergence will normally generate a query that bumps AUTO_INCREMENT to match, which
+can jump/skip a large range of ids. Pass `--ignore-auto-increment` to skip generating AUTO_INCREMENT change queries entirely.
+
+```
+$ convergence apply example.schema -c database.yml --ignore-auto-increment
+```
+
+This also applies to `--dry-run` and `--rollback-dry-run`.
 
 ### Safe migration
 
