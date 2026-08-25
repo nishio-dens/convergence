@@ -7,6 +7,9 @@ class Convergence::DatabaseConnector
       when 'mysql', 'mysql2'
         require 'convergence/database_connector/mysql_connector'
         Convergence::DatabaseConnector::MysqlConnector.new(config)
+      when 'postgresql', 'postgres', 'pg'
+        require 'convergence/database_connector/postgres_connector'
+        Convergence::DatabaseConnector::PostgresConnector.new(config)
       else
         fail NotImplementedError.new("#{config.adapter} not supported yet")
       end

@@ -5,3 +5,11 @@ mysql:
   port: 3306
   username: root
   password: root
+
+postgresql:
+  adapter: postgresql
+  database: convergence_test_db
+  host: 127.0.0.1
+  port: 5432
+  username: postgres
+  password: postgres

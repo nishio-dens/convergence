@@ -4,6 +4,9 @@ class Convergence::DefaultParameter
     when 'mysql', 'mysql2'
       require 'convergence/default_parameter/mysql_default_parameter'
       @parameter_klass = Convergence::DefaultParameter::MysqlDefaultParameter.new
+    when 'postgresql', 'postgres', 'pg'
+      require 'convergence/default_parameter/postgres_default_parameter'
+      @parameter_klass = Convergence::DefaultParameter::PostgresDefaultParameter.new
     else
       fail NotImplementedError.new("unknown adapter #{config.adapter}.")
     end
