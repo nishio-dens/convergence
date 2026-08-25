@@ -8,11 +8,11 @@ require 'convergence/pretty_diff'
 class Convergence::Command::Dryrun < Convergence::Command
   def execute
     current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
-    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
+    dsl = Convergence::DSL.parse_dsl(File.open(@opts[:input]).read, current_dir_path)
     current_tables = dumper.dump
     # -- maybe it's redundant output
-    # output_diff(input_tables, current_tables)
-    output_sql(input_tables, current_tables)
+    # output_diff(dsl.tables, current_tables)
+    output_sql(dsl.tables, current_tables, dsl.raw_sqls)
   end
 
   private
@@ -30,10 +30,10 @@ class Convergence::Command::Dryrun < Convergence::Command
     msg
   end
 
-  def output_sql(input_tables, current_tables)
+  def output_sql(input_tables, current_tables, raw_sqls = [])
     msg = Convergence::Command::Apply
       .new(@opts, config: @config)
-      .generate_sql(input_tables, current_tables)
+      .generate_sql(input_tables, current_tables, raw_sqls)
       .split("\n")
       .map { |v| '# ' + v }
       .join("\n")

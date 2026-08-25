@@ -70,6 +70,15 @@ describe 'Command::Dryrun#execute' do
     end
   end
 
+  describe 'execute raw sql' do
+    let(:exec_dsl) { 'execute_raw_sql.schema' }
+
+    it 'should be output the raw sql statement after the generated schema changes' do
+      result = execute(exec_dsl)
+      expect(result).to be_include('# UPDATE authors SET age = 0 WHERE age IS NULL;')
+    end
+  end
+
   describe 'add columns' do
     let(:exec_dsl) { 'add_columns_to_paper.schema' }
 
