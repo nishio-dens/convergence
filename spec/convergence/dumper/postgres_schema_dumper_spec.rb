@@ -1,16 +1,13 @@
 require 'spec_helper'
-require 'convergence/dumper/mysql_schema_dumper'
+require 'convergence/dumper/postgres_schema_dumper'
 require 'convergence/database_connector'
 
-describe Convergence::Dumper::MysqlSchemaDumper do
-  before do
-    # load fixtures
-  end
+describe Convergence::Dumper::PostgresSchemaDumper do
   let(:connector) do
-    Convergence::DatabaseConnector.new(mysql_settings)
+    Convergence::DatabaseConnector.new(postgres_settings)
   end
   let(:dumper) do
-    Convergence::Dumper::MysqlSchemaDumper.new(connector)
+    Convergence::Dumper::PostgresSchemaDumper.new(connector)
   end
 
   describe '#dump' do
@@ -23,10 +20,8 @@ describe Convergence::Dumper::MysqlSchemaDumper do
     end
 
     describe 'table options' do
-      it 'shoulb be dump options' do
-        papers = subject['papers']
-        expect(papers.table_options[:engine]).to eq('InnoDB')
-        expect(papers.table_options[:comment]).to eq('Paper')
+      it 'should be dump comment' do
+        expect(subject['papers'].table_options[:comment]).to eq('Paper')
       end
     end
 
@@ -34,6 +29,7 @@ describe Convergence::Dumper::MysqlSchemaDumper do
       it 'should be dump table columns' do
         papers = subject['papers']
         expect(papers.columns['id']).not_to be_nil
+        expect(papers.columns['slug']).not_to be_nil
         expect(papers.columns['title1']).not_to be_nil
         expect(papers.columns['title2']).not_to be_nil
         expect(papers.columns['description']).not_to be_nil
@@ -52,7 +48,7 @@ describe Convergence::Dumper::MysqlSchemaDumper do
           expect(subject['papers'].columns['id'].options[:primary_key]).to be_truthy
         end
 
-        it 'should be dump extra' do
+        it 'should be dump extra (identity columns as auto_increment)' do
           expect(subject['papers'].columns['id'].options[:extra]).to eq('auto_increment')
         end
 
@@ -69,15 +65,11 @@ describe Convergence::Dumper::MysqlSchemaDumper do
           expect(subject['authors'].columns['created_at'].options[:null]).to be_truthy
         end
 
-        it 'should be dump unsigned definition' do
-          expect(subject['authors'].columns['age'].options[:unsigned]).to be_truthy
-        end
-
         it 'should be dump default' do
-          expect(subject['papers'].columns['edition_number'].options[:default]).to eq "0"
+          expect(subject['papers'].columns['edition_number'].options[:default]).to eq('0')
           expect(subject['papers'].columns['published_at'].options[:default])
             .to be_a(Proc)
-            .and have_attributes(call: "CURRENT_TIMESTAMP")
+            .and have_attributes(call: 'CURRENT_TIMESTAMP')
         end
       end
     end
@@ -95,27 +87,6 @@ describe Convergence::Dumper::MysqlSchemaDumper do
         expect(index).not_to be_nil
         expect(index.index_columns).to eq(['slug'])
         expect(index.options[:unique]).to eq(true)
-      end
-
-      it 'should be dump non-unique index of papers' do
-        index = subject['papers'].indexes['index_papers_on_title1_title2']
-        expect(index).not_to be_nil
-        expect(index.index_columns).to eq(['title1', 'title2'])
-        expect(index.options[:length]).to eq('title1' => 100, 'title2' => 200)
-        expect(index.options[:unique]).to eq(false)
-      end
-    end
-
-    describe 'enum/set columns' do
-      it 'should be dump enum values' do
-        expect(subject['enum_set_samples'].columns['status'].options[:values])
-          .to eq(%w(active inactive pending))
-        expect(subject['enum_set_samples'].columns['status'].options[:default]).to eq('active')
-      end
-
-      it 'should be dump set values, including values containing quotes' do
-        expect(subject['enum_set_samples'].columns['flags'].options[:values])
-          .to eq(['a', 'b', "it's tricky"])
       end
     end
 

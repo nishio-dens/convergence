@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'convergence/command/dryrun'
 
 describe 'Command::Dryrun#execute' do
-  def execute(dsl_path)
+  def execute(dsl_path, extra_options = {})
     parse_option = {
       input: File.expand_path("#{File.dirname(__FILE__)}/../fixtures/#{dsl_path}")
-    }
+    }.merge(extra_options)
     Convergence::Command::Dryrun.new(parse_option, config: mysql_settings).execute
   end
 
@@ -35,12 +35,38 @@ describe 'Command::Dryrun#execute' do
     end
   end
 
+  describe 'add table with enum/set columns' do
+    let(:exec_dsl) { 'add_table_with_enum_set.schema' }
+    let(:expect_query) do
+      q = <<-QUERY
+# CREATE TABLE `enum_set_dummies` (
+#   `id` int(11) NOT NULL AUTO_INCREMENT,
+#   `status` enum('active','inactive','pending') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'active',
+#   `flags` set('a','b','c') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+#   PRIMARY KEY (`id`)
+# ) ENGINE=InnoDB ROW_FORMAT=Compact DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+      QUERY
+      q.strip
+    end
+    it 'should be output create table query with quoted enum/set values' do
+      result = execute(exec_dsl)
+      expect(result).to be_include(expect_query)
+    end
+  end
+
   describe 'drop table' do
     let(:exec_dsl) { 'drop_table.schema' }
 
     it 'should be output drop table query' do
       result = execute(exec_dsl)
       expect(result).to be_include('DROP TABLE `paper_authors`')
+    end
+
+    context 'when safe_migration is enabled' do
+      it 'should not output drop table query' do
+        result = execute(exec_dsl, safe_migration: true)
+        expect(result).not_to be_include('DROP TABLE `paper_authors`')
+      end
     end
   end
 

@@ -13,11 +13,11 @@ class SQLGenerator::MysqlGenerator < SQLGenerator
 
   attr_reader :original_table
 
-  def generate(to_table, delta, original_table)
+  def generate(to_table, delta, original_table, safe_migration: false)
     @original_table = original_table
     sqls = []
     sqls << change_table_sql(to_table, delta)
-    sqls << drop_table_sqls(delta)
+    sqls << (safe_migration ? [] : drop_table_sqls(delta))
     sqls << create_table_sqls(delta)
     sqls.reject!(&:empty?)
     sqls.join("\n")
@@ -166,6 +166,9 @@ DROP TABLE `#{table_name}`;
   def create_column_sql(column, output_primary_key: false, output_auto_increment: true)
     sql = "`#{column.column_name}`"
     sql += " #{column.type}"
+    if [:enum, :set].include?(column.type)
+      sql += "(#{quote_enum_or_set_values(column.options[:values])})"
+    end
     sql += "(#{column.options[:limit]})" unless column.options[:limit].nil?
     if column.options[:precision] && column.options[:scale]
       sql += "(#{column.options[:precision]}, #{column.options[:scale]})"
@@ -243,6 +246,10 @@ DROP TABLE `#{table_name}`;
         "#{key}=#{v}"
       end
     end.join(' ')
+  end
+
+  def quote_enum_or_set_values(values)
+    Array(values).map { |v| "'#{v.to_s.gsub("'", "''")}'" }.join(',')
   end
 
   def quote_default_expression(value)

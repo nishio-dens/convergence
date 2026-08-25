@@ -5,8 +5,9 @@ require 'yaml'
 RSpec::Core::RakeTask.new('spec')
 task default: :spec
 
-mysql_settings = YAML.load_file("#{File.dirname(__FILE__)}/spec/config/spec_database.yml")['mysql']
-mysql_settings = Hash[mysql_settings.map { |k, v| [k.to_sym, v] }]
+spec_database_settings = YAML.load_file("#{File.dirname(__FILE__)}/spec/config/spec_database.yml")
+mysql_settings = Hash[spec_database_settings['mysql'].map { |k, v| [k.to_sym, v] }]
+postgres_settings = Hash[spec_database_settings['postgresql'].map { |k, v| [k.to_sym, v] }]
 
 namespace :db do
   namespace :convergence do
@@ -30,5 +31,29 @@ namespace :db do
     desc 'Prepare the test databases'
     task prepare: [:build_databases, :create_tables]
     task overhaul: [:drop_databases, :build_databases, :create_tables]
+
+    namespace :postgres do
+      desc 'Build the PostgreSQL database for tests'
+      task :build_databases do
+        ENV['PGPASSWORD'] = postgres_settings[:password].to_s
+        system("psql -U #{postgres_settings[:username]} -h #{postgres_settings[:host]} -p #{postgres_settings[:port]} -d postgres -c 'create database #{postgres_settings[:database]};'")
+      end
+
+      task :drop_databases do
+        ENV['PGPASSWORD'] = postgres_settings[:password].to_s
+        system("psql -U #{postgres_settings[:username]} -h #{postgres_settings[:host]} -p #{postgres_settings[:port]} -d postgres -c 'drop database if exists #{postgres_settings[:database]};'")
+      end
+
+      desc 'Create tables on the PostgreSQL test database'
+      task :create_tables do
+        ENV['PGPASSWORD'] = postgres_settings[:password].to_s
+        query_path = "#{File.dirname(__FILE__)}/spec/fixtures/postgres_test_db.sql"
+        system("psql -U #{postgres_settings[:username]} -h #{postgres_settings[:host]} -p #{postgres_settings[:port]} -d #{postgres_settings[:database]} -f #{query_path}")
+      end
+
+      desc 'Prepare the PostgreSQL test database'
+      task prepare: [:build_databases, :create_tables]
+      task overhaul: [:drop_databases, :build_databases, :create_tables]
+    end
   end
 end

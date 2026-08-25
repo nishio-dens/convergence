@@ -136,7 +136,7 @@ class Convergence::Dumper::MysqlSchemaDumper
     column_type = column['COLUMN_TYPE']
     case data_type
     when :enum, :set
-      # TODO: implement
+      options.merge!(values: parse_enum_or_set_values(column_type))
     when :decimal
       precision, scale = column_type.scan(/\d+/)
       options.merge!(precision: precision, scale: scale)
@@ -181,6 +181,15 @@ class Convergence::Dumper::MysqlSchemaDumper
         fail NotImplementedError.new('Unknown index type')
       end
     end
+  end
+
+  # column_type looks like "enum('a','b','c')" or "set('a','b','c')"
+  def parse_enum_or_set_values(column_type)
+    column_type[/\A(?:enum|set)\((.*)\)\z/i, 1]
+      .to_s
+      .scan(/'((?:[^']|'')*)'/)
+      .flatten
+      .map { |v| v.gsub("''", "'") }
   end
 
   # MySQL 8.0.24+ reports the `utf8` charset/collation as `utf8mb3` (e.g. `utf8mb3_general_ci`).

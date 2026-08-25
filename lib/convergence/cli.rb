@@ -12,13 +12,18 @@ class Convergence::CLI < Thor
   method_option :dry_run, type: :boolean
   method_option :rollback_dry_run, type: :boolean
   method_option :ignore_auto_increment, type: :boolean, desc: 'Do not generate AUTO_INCREMENT change queries'
+  method_option :safe_migration, type: :boolean, desc: 'Do not generate DROP TABLE queries'
 
   def self.exit_on_failure?
     true
   end
 
   def apply(file)
-    opts = { input: file, ignore_auto_increment: options[:ignore_auto_increment] }
+    opts = {
+      input: file,
+      ignore_auto_increment: options[:ignore_auto_increment],
+      safe_migration: options[:safe_migration]
+    }
     if options[:dry_run]
       require 'convergence/command/dryrun'
       Convergence::Command::Dryrun.new(opts, config: config).execute
