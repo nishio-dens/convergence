@@ -18,7 +18,9 @@ class Convergence::Command::Apply < Convergence::Command
       Convergence::DefaultParameter.append_database_default_parameter(current_tables, database_adapter)
     input_tables_with_full_option =
       Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
-    delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
+    delta = Convergence::Diff
+      .new(ignore_auto_increment: @opts[:ignore_auto_increment])
+      .diff(current_tables_with_full_option, input_tables_with_full_option)
     sql = sql_generator.generate(
       input_tables_with_full_option,
       delta,
@@ -44,6 +46,9 @@ class Convergence::Command::Apply < Convergence::Command
                        when 'postgresql', 'postgres', 'pg'
                          require 'convergence/sql_generator/postgres_generator'
                          SQLGenerator::PostgresGenerator.new
+                       when 'sqlite3', 'sqlite'
+                         require 'convergence/sql_generator/sqlite_generator'
+                         SQLGenerator::SqliteGenerator.new
                        else
                          fail NotImplementedError.new('unknown database adapter')
                        end

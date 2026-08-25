@@ -30,6 +30,9 @@ class Convergence::Command
                 when 'postgresql', 'postgres', 'pg'
                   require 'convergence/dumper/postgres_schema_dumper'
                   Convergence::Dumper::PostgresSchemaDumper.new(connector)
+                when 'sqlite3', 'sqlite'
+                  require 'convergence/dumper/sqlite_schema_dumper'
+                  Convergence::Dumper::SqliteSchemaDumper.new(connector)
                 else
                   fail NotImplementedError.new('unknown database adapter')
                 end

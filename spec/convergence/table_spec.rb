@@ -28,6 +28,29 @@ describe Convergence::Table do
     end
   end
 
+  describe '#boolean' do
+    it 'should be stored as a tinyint(1) column' do
+      table.boolean(dummy_column)
+      expect(table.columns[dummy_column].type).to eq(:tinyint)
+      expect(table.columns[dummy_column].options[:limit]).to eq(1)
+    end
+
+    it 'should convert a true default to 1' do
+      table.boolean(dummy_column, default: true)
+      expect(table.columns[dummy_column].options[:default]).to eq(1)
+    end
+
+    it 'should convert a false default to 0' do
+      table.boolean(dummy_column, default: false)
+      expect(table.columns[dummy_column].options[:default]).to eq(0)
+    end
+
+    it 'should preserve other options' do
+      table.boolean(dummy_column, null: false)
+      expect(table.columns[dummy_column].options[:null]).to eq(false)
+    end
+  end
+
   describe '#index' do
     context 'when option name is nil' do
       it 'should generate index name' do
