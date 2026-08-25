@@ -1,3 +1,49 @@
+## Convergence 1.1.0 (August 25, 2026) ##
+
+* Add PostgreSQL support (PR: #93)
+
+  *nishio-dens*
+
+* Add SQLite support (PR: #95)
+
+  *nishio-dens*
+
+* Support ENUM/SET column types (PR: #92)
+
+  *nishio-dens*
+
+* Add `execute()` DSL method to run raw SQL (PR: #94)
+
+  *nishio-dens*
+
+* Add `--dump-rails-migration` option to export DB schema as a Rails migration file (PR: #96)
+
+  *nishio-dens*
+
+* Add `--safe-migration` option to skip DROP TABLE queries (PR: #91)
+
+  *nishio-dens*
+
+* Add `--ignore-auto-increment` option (PR: #90)
+
+  *nishio-dens*
+
+* Fix MySQL 8.0 test failure and modernize CI Ruby matrix (PR: #89)
+
+  *nishio-dens*
+
+* Bump diffy to >= 3.4.2, fixing CVE-2022-33127 (PR: #100)
+
+  *nishio-dens*
+
+* Add specs for previously untested classes/commands (PR: #97)
+
+  *nishio-dens*
+
+* Add CONTRIBUTING.md (PR: #98)
+
+  *nishio-dens*
+
 ## Convergence 1.0.6 (April 28, 2022) ##
 
 * Fixes YAML.safe_load arguments (PR: #84)
