@@ -89,4 +89,30 @@ describe Convergence::DSL do
       end
     end
   end
+
+  describe '#parse_dsl' do
+    let(:dsl_with_execute) do
+      <<-DSL
+      create_table "users" do |t|
+        t.int "id", primary_key: true, extra: "auto_increment"
+      end
+
+      execute "CREATE OR REPLACE VIEW active_users AS SELECT * FROM users"
+      execute "GRANT SELECT ON users TO readonly"
+      DSL
+    end
+
+    subject { Convergence::DSL.parse_dsl(dsl_with_execute, '') }
+
+    it 'should be able to parse tables' do
+      expect(subject.tables['users']).not_to be_nil
+    end
+
+    it 'should be able to collect raw sql statements in order' do
+      expect(subject.raw_sqls).to eq([
+        'CREATE OR REPLACE VIEW active_users AS SELECT * FROM users',
+        'GRANT SELECT ON users TO readonly'
+      ])
+    end
+  end
 end

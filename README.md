@@ -276,6 +276,20 @@ include 'first_schema.schema'
 include 'other_file.schema'
 ```
 
+### Execute raw SQL
+
+For things the DSL has no dedicated syntax for (views, triggers, stored procedures, data backfills, grants, ...),
+use `execute` to run an arbitrary SQL statement. Unlike `create_table`, statements passed to `execute` are **not**
+diffed against the current schema: they run every time the schema file is applied, so make sure the SQL itself is
+idempotent (e.g. `CREATE OR REPLACE VIEW ...`, `CREATE TABLE IF NOT EXISTS ...`).
+
+```
+execute "CREATE OR REPLACE VIEW active_users AS SELECT * FROM users WHERE active = 1"
+```
+
+`execute` statements always run after the generated schema changes, and are skipped by `--rollback-dry-run` (there's
+no way to know how to reverse an arbitrary SQL statement).
+
 
 ## Detail About Convergence DSL
 

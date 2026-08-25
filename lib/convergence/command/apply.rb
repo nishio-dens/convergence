@@ -8,26 +8,33 @@ require 'convergence/diff'
 class Convergence::Command::Apply < Convergence::Command
   def execute
     current_dir_path = Pathname.new(@opts[:input]).realpath.dirname
-    input_tables = Convergence::DSL.parse(File.open(@opts[:input]).read, current_dir_path)
+    dsl = Convergence::DSL.parse_dsl(File.open(@opts[:input]).read, current_dir_path)
     current_tables = dumper.dump
-    execute_sql(input_tables, current_tables)
+    execute_sql(dsl.tables, current_tables, dsl.raw_sqls)
   end
 
-  def generate_sql(input_tables, current_tables)
+  def generate_sql(input_tables, current_tables, raw_sqls = [])
     current_tables_with_full_option =
       Convergence::DefaultParameter.append_database_default_parameter(current_tables, database_adapter)
     input_tables_with_full_option =
       Convergence::DefaultParameter.append_database_default_parameter(input_tables, database_adapter)
     delta = Convergence::Diff.new.diff(current_tables_with_full_option, input_tables_with_full_option)
-    sql_generator.generate(
+    sql = sql_generator.generate(
       input_tables_with_full_option,
       delta,
       current_tables_with_full_option,
       safe_migration: @opts[:safe_migration]
     )
+    append_raw_sqls(sql, raw_sqls)
   end
 
   private
+
+  def append_raw_sqls(sql, raw_sqls)
+    return sql if raw_sqls.empty?
+    raw_sql_block = raw_sqls.map { |q| q.strip.end_with?(';') ? q.strip : "#{q.strip};" }.join("\n")
+    [sql, raw_sql_block].reject(&:empty?).join("\n")
+  end
 
   def sql_generator
     @sql_generator ||= case database_adapter
@@ -55,8 +62,8 @@ SET FOREIGN_KEY_CHECKS=1;
     end
   end
 
-  def execute_sql(input_tables, current_tables)
-    sql = generate_sql(input_tables, current_tables)
+  def execute_sql(input_tables, current_tables, raw_sqls = [])
+    sql = generate_sql(input_tables, current_tables, raw_sqls)
     unless sql.strip.empty?
       sql = wrap_with_constraint_pragma(sql)
     end
