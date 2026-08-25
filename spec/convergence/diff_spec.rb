@@ -64,6 +64,96 @@ describe Convergence::DSL do
       end
     end
 
+    context 'when a table is renamed' do
+      let(:renamed_table) do
+        Convergence::Table.new('simple_table_renamed', renamed_from: 'simple_table').tap do |t|
+          t.int('id', primary_key: true)
+        end
+      end
+      let(:from_db) do
+        { 'simple_table' => simple_table }
+      end
+      let(:to_db) do
+        { 'simple_table_renamed' => renamed_table }
+      end
+
+      subject { Convergence::Diff.new.diff(from_db, to_db) }
+
+      it 'should detect it as a rename, not add/remove' do
+        expect(subject[:rename_table]).to eq('simple_table' => 'simple_table_renamed')
+        expect(subject[:add_table]).to be_empty
+        expect(subject[:remove_table]).to be_empty
+        expect(subject[:change_table]).to be_empty
+      end
+    end
+
+    context 'when renamed_from references a table that does not exist' do
+      let(:renamed_table) do
+        Convergence::Table.new('simple_table2', renamed_from: 'nonexistent_table').tap do |t|
+          t.int('id', primary_key: true)
+        end
+      end
+      let(:from_db) do
+        { 'simple_table' => simple_table }
+      end
+      let(:to_db) do
+        { 'simple_table' => simple_table, 'simple_table2' => renamed_table }
+      end
+
+      subject { Convergence::Diff.new.diff(from_db, to_db) }
+
+      it 'should fall back to a normal add' do
+        expect(subject[:rename_table]).to be_empty
+        expect(subject[:add_table]['simple_table2']).not_to be_nil
+      end
+    end
+
+    context 'when the renamed_from target already exists (idempotent re-apply)' do
+      let(:renamed_table) do
+        Convergence::Table.new('simple_table2', renamed_from: 'simple_table').tap do |t|
+          t.int('id', primary_key: true)
+        end
+      end
+      let(:from_db) do
+        { 'simple_table' => simple_table, 'simple_table2' => simple_table2 }
+      end
+      let(:to_db) do
+        { 'simple_table' => simple_table, 'simple_table2' => renamed_table }
+      end
+
+      subject { Convergence::Diff.new.diff(from_db, to_db) }
+
+      it 'should be a no-op for the rename' do
+        expect(subject[:rename_table]).to be_empty
+        expect(subject[:add_table]).to be_empty
+        expect(subject[:remove_table]).to be_empty
+        expect(subject[:change_table]).to be_empty
+      end
+    end
+
+    context 'when multiple tables claim the same renamed_from (ambiguous)' do
+      let(:renamed_table1) do
+        Convergence::Table.new('simple_table_a', renamed_from: 'simple_table').tap do |t|
+          t.int('id', primary_key: true)
+        end
+      end
+      let(:renamed_table2) do
+        Convergence::Table.new('simple_table_b', renamed_from: 'simple_table').tap do |t|
+          t.int('id', primary_key: true)
+        end
+      end
+      let(:from_db) do
+        { 'simple_table' => simple_table }
+      end
+      let(:to_db) do
+        { 'simple_table_a' => renamed_table1, 'simple_table_b' => renamed_table2 }
+      end
+
+      it 'should raise an ArgumentError' do
+        expect { Convergence::Diff.new.diff(from_db, to_db) }.to raise_error(ArgumentError)
+      end
+    end
+
     context 'table column are changed' do
       let(:table_from) do
         Convergence::Table.new('table1').tap do |t|
@@ -130,6 +220,23 @@ describe Convergence::DSL do
           expect(results[:change_table]).to be_empty
           included_after_option = results[:add_table].each_value.map { |t| t.columns.each_value.map { |c| c.options.key?(:after) } }.flatten.any?
           expect(included_after_option).to eq false
+        end
+      end
+
+      context 'all columns are renamed' do
+        let(:table_to) do
+          Convergence::Table.new('table1').tap do |t|
+            t.int('id_rename', primary_key: true, renamed_from: 'id')
+            t.varchar('name_rename', limit: 200, null: false, renamed_from: 'name')
+          end
+        end
+
+        it 'should detect it as a change_table with rename_column, not a drop+add' do
+          results = Convergence::Diff.new.diff({ 'table1' => table_from }, { 'table1' => table_to })
+          expect(results[:add_table]).to be_empty
+          expect(results[:remove_table]).to be_empty
+          expect(results[:change_table]).not_to be_empty
+          expect(results[:change_table]['table1'][:rename_column]).to eq('id' => 'id_rename', 'name' => 'name_rename')
         end
       end
     end
@@ -245,6 +352,66 @@ describe Convergence::DSL do
         expect(results[:change_column]['name']).to be_nil
         expect(results[:change_column]['id']).not_to be_nil
         expect(results[:change_column]['id'][:after]).to eq('name')
+      end
+    end
+
+    context 'rename column' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+        end
+      end
+      let(:table_to) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('full_name', limit: 200, null: false, renamed_from: 'name')
+        end
+      end
+
+      it 'should detect it as a rename, not remove+add' do
+        expect(results[:rename_column]).to eq('name' => 'full_name')
+        expect(results[:remove_column]).to be_empty
+        expect(results[:add_column]).to be_empty
+      end
+    end
+
+    context 'rename column together with an unrelated change on another column' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('name', limit: 200, null: false)
+        end
+      end
+      let(:table_to) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+          t.varchar('full_name', limit: 300, null: false, renamed_from: 'name')
+        end
+      end
+
+      it 'should detect only the rename, deferring the other change to the next apply pass' do
+        expect(results[:rename_column]).to eq('name' => 'full_name')
+        expect(results[:change_column]).to be_empty
+      end
+    end
+
+    context 'rename the only column in a table' do
+      let(:table_from) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('id', primary_key: true)
+        end
+      end
+      let(:table_to) do
+        Convergence::Table.new('table1').tap do |t|
+          t.int('identifier', primary_key: true, renamed_from: 'id')
+        end
+      end
+
+      it 'should not be misdetected as removing all columns' do
+        expect(results[:rename_column]).to eq('id' => 'identifier')
+        expect(results[:remove_column]).to be_empty
+        expect(results[:add_column]).to be_empty
       end
     end
 

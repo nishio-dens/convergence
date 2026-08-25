@@ -3,7 +3,7 @@ require 'convergence/index'
 require 'convergence/foreign_key'
 
 class Convergence::Table
-  attr_accessor :table_name, :table_options, :columns, :indexes, :foreign_keys
+  attr_accessor :table_name, :table_options, :columns, :indexes, :foreign_keys, :renamed_from
 
   Convergence::Column::COLUMN_TYPE.each do |column_type|
     define_method "#{column_type}" do |column_name, options = {}|
@@ -46,7 +46,8 @@ class Convergence::Table
 
   def initialize(table_name, options = {})
     @table_name = table_name
-    @table_options = options.reject { |k| k == :id }
+    @renamed_from = options[:renamed_from]&.to_s
+    @table_options = options.reject { |k| k == :id || k == :renamed_from }
     @columns = {}
     @indexes = {}
     @foreign_keys = {}

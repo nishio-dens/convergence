@@ -26,6 +26,29 @@ describe Convergence::Table do
       table.decimal(dummy_column, default: 1)
       expect(table.columns[dummy_column].options[:default]).to eq(1.0)
     end
+
+    it 'should extract renamed_from into its own accessor' do
+      table.int(dummy_column, renamed_from: 'old_column')
+      expect(table.columns[dummy_column].renamed_from).to eq('old_column')
+      expect(table.columns[dummy_column].options).not_to have_key(:renamed_from)
+    end
+
+    it 'should have a nil renamed_from when not specified' do
+      table.int(dummy_column)
+      expect(table.columns[dummy_column].renamed_from).to be_nil
+    end
+  end
+
+  describe 'renamed_from' do
+    it 'should extract renamed_from into its own accessor' do
+      renamed_table = Convergence::Table.new('new_table', renamed_from: 'old_table')
+      expect(renamed_table.renamed_from).to eq('old_table')
+      expect(renamed_table.table_options).not_to have_key(:renamed_from)
+    end
+
+    it 'should have a nil renamed_from when not specified' do
+      expect(table.renamed_from).to be_nil
+    end
   end
 
   describe '#boolean' do
