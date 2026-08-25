@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pg'
   spec.add_dependency 'sqlite3'
   spec.add_dependency 'diff-lcs'
-  spec.add_dependency 'diffy'
+  spec.add_dependency 'diffy', '>= 3.4.2'
   spec.add_dependency 'thor'
 
   spec.required_ruby_version = ">= 2.4.0"
