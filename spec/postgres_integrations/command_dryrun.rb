@@ -67,6 +67,28 @@ describe 'PostgreSQL Command::Dryrun#execute' do
     end
   end
 
+  describe 'rename column' do
+    let(:exec_dsl) { 'rename_column_on_paper.schema' }
+
+    it 'should be output rename column query, not drop+add' do
+      result = execute(exec_dsl)
+      expect(result).to be_include(%(# ALTER TABLE "papers" RENAME COLUMN "description" TO "notes";))
+      expect(result).not_to be_include('DROP COLUMN "description"')
+      expect(result).not_to be_include('ADD COLUMN "notes"')
+    end
+  end
+
+  describe 'rename table' do
+    let(:exec_dsl) { 'rename_table.schema' }
+
+    it 'should be output rename table query, not drop+add' do
+      result = execute(exec_dsl)
+      expect(result).to be_include(%(# ALTER TABLE "paper_authors" RENAME TO "paper_author_links";))
+      expect(result).not_to be_include('DROP TABLE "paper_authors"')
+      expect(result).not_to be_include('CREATE TABLE "paper_author_links"')
+    end
+  end
+
   describe 'drop foreign key' do
     let(:exec_dsl) { 'drop_foreign_key.schema' }
 

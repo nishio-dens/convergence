@@ -37,6 +37,7 @@ class SQLGenerator::PostgresGenerator < SQLGenerator
   def generate(to_table, delta, original_table, safe_migration: false)
     @original_table = original_table
     sqls = []
+    sqls << rename_table_sqls(delta)
     sqls << change_table_sql(to_table, delta)
     sqls << (safe_migration ? [] : drop_table_sqls(delta))
     sqls << create_table_sqls(delta)
@@ -45,6 +46,12 @@ class SQLGenerator::PostgresGenerator < SQLGenerator
   end
 
   private
+
+  def rename_table_sqls(delta)
+    results = delta[:rename_table].map { |old_name, new_name| %(ALTER TABLE "#{old_name}" RENAME TO "#{new_name}";) }
+    results << '' unless results.empty?
+    results
+  end
 
   # FIXME: multiple pk change not supported yet
   def change_table_sql(to_table, delta)
@@ -56,6 +63,9 @@ class SQLGenerator::PostgresGenerator < SQLGenerator
       end
       table_delta[:remove_index].each do |index_name, _index|
         results << alter_remove_index_sql(index_name)
+      end
+      table_delta[:rename_column].each do |old_name, new_name|
+        results << alter_rename_column_sql(table_name, old_name, new_name)
       end
       unless table_delta[:remove_column].empty?
         results << alter_remove_columns_sql(table_name, table_delta[:remove_column].values)
@@ -88,6 +98,10 @@ class SQLGenerator::PostgresGenerator < SQLGenerator
 
   def alter_remove_columns_sql(table_name, columns)
     columns.map { |column| %(ALTER TABLE "#{table_name}" DROP COLUMN "#{column.column_name}";) }.join("\n")
+  end
+
+  def alter_rename_column_sql(table_name, old_name, new_name)
+    %(ALTER TABLE "#{table_name}" RENAME COLUMN "#{old_name}" TO "#{new_name}";)
   end
 
   def alter_change_column_sql(table_name, column_name, change_column_option, to_table)

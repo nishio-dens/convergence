@@ -11,6 +11,9 @@ class Convergence::Diff
   def diff(from_database, to_database)
     delta = {}
     from_database = {} if from_database.nil?
+    delta[:rename_table] = scan_rename_table(from_database, to_database)
+    from_database = from_database.reject { |name, _| delta[:rename_table].key?(name) }
+    to_database = to_database.reject { |name, _| delta[:rename_table].value?(name) }
     delta[:add_table] = scan_add_table(from_database, to_database)
     delta[:remove_table] = scan_remove_table(from_database, to_database)
     change_table = scan_change_table(from_database, to_database)
@@ -24,8 +27,11 @@ class Convergence::Diff
     from = from_table.dup
     to = to_table.dup
     delta = {}
+    delta[:rename_column] = scan_rename_column(from, to)
+    from.columns = from.columns.reject { |name, _| delta[:rename_column].key?(name) }
+    to.columns = to.columns.reject { |name, _| delta[:rename_column].value?(name) }
     delta[:remove_column] = scan_remove_column(from, to)
-    return delta if removed_all_columns?(from, delta)
+    return delta if removed_all_columns?(from_table, delta)
     delta[:add_column] = scan_add_column(from, to)
     delta[:change_column] = scan_change_column(from, to)
     scan_change_order_column(from, to, delta)
@@ -38,6 +44,36 @@ class Convergence::Diff
   end
 
   private
+
+  def scan_rename_table(from, to)
+    renames = {}
+    to.each do |new_name, to_table|
+      old_name = to_table.renamed_from
+      next if old_name.nil?
+      next unless from.key?(old_name)
+      next if from.key?(new_name)
+      if renames.key?(old_name)
+        fail ArgumentError.new("renamed_from '#{old_name}' is specified for multiple tables")
+      end
+      renames[old_name] = new_name
+    end
+    renames
+  end
+
+  def scan_rename_column(from, to)
+    renames = {}
+    to.columns.each do |new_name, to_column|
+      old_name = to_column.renamed_from
+      next if old_name.nil?
+      next unless from.columns.key?(old_name)
+      next if from.columns.key?(new_name)
+      if renames.key?(old_name)
+        fail ArgumentError.new("#{to.table_name}: renamed_from '#{old_name}' is specified for multiple columns")
+      end
+      renames[old_name] = new_name
+    end
+    renames
+  end
 
   def scan_add_table(from, to)
     to.reject { |table_name, _| from.map { |k, _| k }.include?(table_name) }

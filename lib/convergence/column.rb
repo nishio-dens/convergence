@@ -1,5 +1,5 @@
 class Convergence::Column
-  attr_accessor :type, :column_name, :options
+  attr_accessor :type, :column_name, :options, :renamed_from
 
   COLUMN_TYPE = %i(
     tinyint
@@ -38,6 +38,7 @@ class Convergence::Column
   def initialize(type, column_name, options = {})
     @type = type
     @column_name = column_name
-    @options = options
+    @renamed_from = options[:renamed_from]&.to_s
+    @options = options.reject { |k| k == :renamed_from }
   end
 end

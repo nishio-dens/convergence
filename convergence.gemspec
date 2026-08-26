@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'diff-lcs'
   spec.add_dependency 'diffy', '>= 3.4.2'
   spec.add_dependency 'thor'
+  spec.add_dependency 'logger'
+  spec.add_dependency 'benchmark'
 
   spec.required_ruby_version = ">= 2.4.0"
 

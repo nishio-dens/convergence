@@ -108,6 +108,28 @@ describe 'Command::Dryrun#execute' do
     end
   end
 
+  describe 'rename column' do
+    let(:exec_dsl) { 'rename_column_to_author.schema' }
+
+    it 'should be output rename column query, not drop+add' do
+      result = execute(exec_dsl)
+      expect(result).to be_include('# ALTER TABLE `authors` RENAME COLUMN `name` TO `full_name`;')
+      expect(result).not_to be_include('DROP COLUMN `name`')
+      expect(result).not_to be_include('ADD COLUMN `full_name`')
+    end
+  end
+
+  describe 'rename table' do
+    let(:exec_dsl) { 'rename_table.schema' }
+
+    it 'should be output rename table query, not drop+add' do
+      result = execute(exec_dsl)
+      expect(result).to be_include('# ALTER TABLE `paper_authors` RENAME TO `paper_author_links`;')
+      expect(result).not_to be_include('DROP TABLE `paper_authors`')
+      expect(result).not_to be_include('CREATE TABLE `paper_author_links`')
+    end
+  end
+
   describe 'auto increment' do
     describe 'create table with auto increment option' do
       let(:exec_dsl) { 'add_table.schema' }
