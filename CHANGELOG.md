@@ -1,3 +1,14 @@
+## Convergence 1.2.0 (August 26, 2026) ##
+
+* Add `renamed_from:` support to detect table/column renames instead of a
+  destructive drop+add, for MySQL, PostgreSQL, and SQLite (PR: #101)
+
+  *nishio-dens*
+
+* Bump rexml to fix CVE-2024-49761 (PR: #103)
+
+  *nishio-dens*
+
 ## Convergence 1.1.0 (August 25, 2026) ##
 
 * Add PostgreSQL support (PR: #93)
